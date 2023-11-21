@@ -1,0 +1,283 @@
+@using Kendo.Mvc.UI
+@using ISS.Common
+@using ISS.Web.Helpers
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <title>@ViewBag.Title  </title>
+    @Styles.Render("~/Content/css" + ISSGlobals.Version)
+
+    @*@BundleTable.Bundles.ResolveBundleUrl("~/bundles/custom"*@
+    @Scripts.Render("~/bundles/jquery")
+
+    @Styles.Render("~/content/Bootstrap1")
+    @Styles.Render("~/content/Bootstrap2")
+
+    @* <link href="@Url.Action("kendo", "Content")/2014.2.1008/kendo.common-bootstrap.min.css" rel="stylesheet">
+        <link href="@Url.Action("kendo", "Content")/2014.2.1008/kendo.bootstrap.min.css" rel="stylesheet">*@
+
+
+    @Scripts.Render("~/bundles/kendo")
+    @Scripts.Render("~/bundles/kendo2")
+
+    @*<script src="@Url.Action("kendo", "Scripts")/2014.2.1008/kendo.all.min.js"></script>
+        <script src="@Url.Action("kendo", "Scripts")/2014.2.1008/kendo.aspnetmvc.min.js"></script>*@
+
+
+    @Scripts.Render("~/bundles/custom" + ISSGlobals.Version)
+
+    <link rel="shortcut icon" href="@Url.Action("icon", "Images", new { Area = "" })/favicon.png" />
+
+    @RenderSection("scripts", required: false)
+
+    <script type="text/javascript">
+        window.onload = function(){
+            $('.leftMenu, .menudisp1').height($(document).height())
+            if($('.navRight').height()<$(document).height()-100){
+                $('.navRight').css('min-height',$(document).height()-100);
+            }
+        }
+        $(document).ready(function () {
+            serverDate=new Date(@(DateTime.Now.Year),@(DateTime.Now.Month - 1),@(DateTime.Now.Day));
+            ISS.common.Settings.urlCommonSearch='@Url.Action("commonsearch", "shared", new  { area=""})'
+
+            @if(Request.IsLocal){
+                <text>
+           // ISS.common.Settings.Animation = false;
+            </text>
+            }
+            ISS.common.Settings.CurrentDate=serverDate;
+            $('.navLeft ul li a').each(function (idx, item) {
+                if ($(this).attr('href') != '' && $(this).attr('href')!='#'){
+                    if( window.location.href.toLocaleLowerCase().search($(this).attr('href').toLocaleLowerCase())>=0){
+                        $(this).parent().addClass('active').closest('.expmenuitem').slideDown();
+
+                    }
+                }
+            });
+            $('.navLeft ul li a.expmenu').bind('click',function(){
+                $(this).parent().next().slideToggle('slow');
+                return false;
+            });
+        })
+    </script>
+</head>
+<body>
+
+    <div class="header">
+        <h2 class="ISSsubTitle">AVYX Planning Workbench</h2>
+        <h3 class="floatRight ISSTitle"> Welcome @ViewBag.UserName</h3>
+        <h1 class="logo" title="Hanes Brands INC - Logo"></h1>
+        <div class="clear"></div>
+    </div>
+    <div class="contentSection">
+
+        <div class="menufixer menudisp1" title="Collapse menu">
+        </div>
+
+        <div class="menudisp2 navLeft floatLeft height700 leftMenu">
+
+            <ul>
+                @{bool? ressummary = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SUMMARY);}
+                @if (ressummary.HasValue && ressummary.Value)
+                {
+                    <li><a href="@Url.Action("summary", "Order", new { Area = "" })">Summary</a></li>
+                }
+                @{bool? resultSO = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SOURCED_ORDER);}
+                @{bool? resultWO = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WORK_ORDER);}
+                @{bool? kaBulkOrder = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_BULKORDER);}
+                @{bool? resultAWO = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_ATTRIBUTTED_WORK_ORDER);}
+
+
+                @if ((resultSO.HasValue && resultSO.Value) || (resultWO.HasValue && resultWO.Value) || (kaBulkOrder.HasValue && kaBulkOrder.Value) || (resultAWO.HasValue && resultAWO.Value))
+                {
+                    <li><a class="expmenu" href="javascript:void(0)">Create / Edit  Order</a> </li>
+                    <li class="expmenuitem" style="display:none;">
+                        <ul>
+
+                            @if (resultSO.HasValue && resultSO.Value)
+                            {
+                                <li><a href="@Url.Action("createrequisitions", "order", new { Area = "" })"> Sourced Order</a></li>
+                            }
+
+                            @if (resultWO.HasValue && resultWO.Value)
+                            {
+                                <li><a href="@Url.Action("createworkorder", "order", new { Area = "" })"> Work Order</a></li>
+                            }
+
+                            @if (kaBulkOrder.HasValue && kaBulkOrder.Value)
+                            {
+                                <li><a href="@Url.Action("review", "bulkorder", new { Area = "KA" })"> Bulk Order</a></li>
+                            }
+
+                            @if (resultAWO.HasValue && resultAWO.Value)
+                            {
+                                <li><a href="@Url.Action("createworkorder", "AttributionOrder", new { Area = "KA" })"> Attributed Work Orders</a></li>
+                            }
+                        </ul>
+                    </li>
+                }
+
+                @{bool? resultWOMgmt = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WORK_ORDER_MANAGEMENT);}
+                @{bool? resultAttrMrz = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WORK_ATTRIBUTE_MRZ);}
+                @{bool? resultAWOMgmt1 = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_ATTRIBUTION_MANAGEMENT);}
+                @if ((resultWOMgmt.HasValue && resultWOMgmt.Value) || (resultAWOMgmt1.HasValue && resultAWOMgmt1.Value))
+                {
+                    <li><a class="expmenu" href="javascript:void(0)">Order Mgmt</a> </li>
+                    <li class="expmenuitem" style="display:none;">
+                        <ul>
+                            @if (resultWOMgmt.HasValue && resultWOMgmt.Value)
+                        {
+                                <li><a href="@Url.Action("WOManagement", "Order", new { Area = "" })">Work Order</a></li>
+                        }
+                        @if (resultAttrMrz.HasValue && resultAttrMrz.Value)
+                        {
+                            <li><a href="@Url.Action("AttributeMrz", "Order", new { Area = "" })">Attribution MRZ</a></li>
+                        }
+
+                            @if (resultAWOMgmt1.HasValue && resultAWOMgmt1.Value)
+                        {
+                                <li><a href="@Url.Action("Management", "AttributionOrder", new { Area = "KA" })">
+                                    Attribution Order </a></li>
+                        }
+                        </ul>
+                    </li>
+                }
+                @{bool? resultCapacity = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.CAPACITY);}
+                @if (resultCapacity.HasValue && resultCapacity.Value)
+                        {
+                    <li><a href="@Url.Action("Allocation", "Capacity", new { Area = "" })">Capacity</a></li>
+                        }
+
+                @{bool? resultTextiles = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.TEXTILES);}
+                @if (resultTextiles.HasValue && resultTextiles.Value)
+                        {
+                    <li><a href="@Url.Action("Detail", "Textiles", new { Area = "" })">Textiles</a></li>
+                        }
+                @{bool? resultMaterial = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_BLANK_SUPPLY);}
+                @if (  resultMaterial.HasValue && resultMaterial.Value)
+                        {
+                    <li><a href="@Url.Action("MaterialBlankSupply", "BlankSupply", new { Area = "KA" })">PAB</a></li>
+                        }
+                @{bool? resultInfo = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_REL);}
+                @{bool? resultsug = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_SUG);}
+                @{bool? dcWO = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_DCWO);}
+                @{bool? style = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_STYLE);}
+                @{bool? woTex = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_WO_TEX);}
+                @{bool? blown = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_BLOWN);}
+                @{bool? bulkavyx = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_BULKTOAVYX);}
+                @{bool? bulkonesource = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_BULKSTOONESOURCE);}
+                @{bool? knightapparelexpedite = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.INFORMATION_KNIGHTSAPPARELEXPEDITE);}
+                @if (((resultInfo.HasValue && resultInfo.Value) || (resultsug.HasValue && resultsug.Value) || (dcWO.HasValue && dcWO.Value) || (style.HasValue && style.Value) || (woTex.HasValue && woTex.Value) || (blown.HasValue && blown.Value)))
+                        {
+                    <li><a href="javascript:void(0)" class="expmenu">Information</a> </li>
+                    <li class="expmenuitem" style="display:none;">
+                        <ul>
+                            @if (resultInfo.HasValue && resultInfo.Value)
+                                    {
+                                <li><a href="@Url.Action("releases", "information", new { Area = "" })">Releases</a></li>
+                                    }
+                            @if (resultsug.HasValue && resultsug.Value)
+                                    {
+                                <li><a href="@Url.Action("suggestedExceptions", "information", new { Area = "" })">Suggested Exceptions</a></li>
+                                    }
+                            @if (dcWO.HasValue && dcWO.Value)
+                                    {
+                                <li><a href="@Url.Action("dcworkorders", "information", new { Area = "" })">DC Work Orders</a></li>
+                                    }
+                            @if (style.HasValue && style.Value)
+                                    {
+                                <li><a href="@Url.Action("styleexception", "information", new { Area = "" })">Style Exceptions</a></li>
+                                    }
+                            @if (woTex.HasValue && woTex.Value)
+                                    {
+                                <li><a href="@Url.Action("StyleWOTextileGroup", "information", new { Area = "" })">Style W/O Textile Group</a></li>
+                                    }
+                            @if (blown.HasValue && blown.Value)
+                                    {
+                                <li><a href="@Url.Action("blownawaylots", "information", new { Area = "" })">Blown Away Lots</a></li>
+                                    }
+                            @if (bulkavyx.HasValue && bulkavyx.Value)
+                            {
+                                <li><a href="@Url.Action("bulkstoavyx", "information", new { Area = "" })">Bulks to AVYX</a></li>
+                            }
+                            @if (bulkonesource.HasValue && bulkonesource.Value)
+                            {
+                                <li><a href="@Url.Action("bulkstoonesource", "information", new { Area = "" })">Bulks to OneSource</a></li>
+                            }
+                            @if (knightapparelexpedite.HasValue && knightapparelexpedite.Value)
+                            {
+                                <li><a href="@Url.Action("KnightsApparelExpedite", "information", new { Area = "" })">Knight Apparel Expedite</a></li>
+                            }
+                        </ul>
+                    </li>
+                        }
+
+            </ul>
+        </div>
+
+        <div class="navRight floatLeft paddingLeft50    ">
+
+
+            @RenderBody()
+        </div>
+        <div class="clear"></div>
+    </div>
+
+
+    <span id="popupNotification"></span>
+
+    <div id="showpopupMsg" class="popcontent" style="display:none;">
+        <div class="content">
+
+        </div>
+        <div>
+            <div style="float:right;">
+                <input type="button" class="showpopupMsgOk btnshowpopupOk k-button" value="Ok" />
+
+            </div>
+        </div>
+    </div>
+    <div id="showConfMsg" class="popcontent" style="display:none;">
+        <div class="content">
+
+        </div>
+        <div class="footerMsg">
+            <div style="float:right;">
+                <input type="button" class="showpopupMsgOk btnshowconfOk k-button" value="Yes" />
+                <input type="button" class="showpopupMsgCancel k-button" value="No" />
+            </div>
+
+        </div>
+    </div>
+    <div id="xyz" style="display:none;"></div>
+    <script id="Errtemplate" type="text/x-kendo-template">
+        <div class="errToolCus">
+            <p>#=target.data('title')#</p>
+        </div>
+    </script>
+
+    <script id="tooltemplate" type="text/x-kendo-template">
+        <p>#=target.data('title')#</p>
+    </script>
+
+    <div id="divCommonSearch" class="cdivCommonSearch" style="position:absolute;">
+
+    </div>
+
+    <div id="pbModal" class="pbModal">
+        <br />
+        <center>
+            <div class="pbDiv">
+                <div id="progressbar"></div>
+                <br />
+                <label id="lblProgressStatus" style="color:black; font-weight:700"></label>
+            </div>
+        </center>
+    </div>
+    <div class="modal "></div>
+
+</body>
+</html>

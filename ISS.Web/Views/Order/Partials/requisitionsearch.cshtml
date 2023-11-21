@@ -1,0 +1,154 @@
+﻿@using ISS.Core.Model.Order;
+@model RequisitionSearch
+
+@using (Html.BeginForm("", "", FormMethod.Get, new { Id = "frmReqSearch" }))
+{
+    <div id="requisitionSearch">
+        <table class="ttab">
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.RequisitionId)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.LabelFor(m => m.FromDate)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.LabelFor(m => m.ToDate)
+                </td>
+                <td></td>
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+                <td>
+                    @Html.Kendo().TextBoxFor(r => r.RequisitionId).HtmlAttributes(new { @class = "uppercase" })
+                    @*@Html.TextBoxFor(d => d.RequisitionId, new { @class = "k-textbox" })*@
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.Kendo().DatePickerFor(d => d.FromDate)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.Kendo().DatePickerFor(d => d.ToDate)
+                </td>
+                <td class="dspace"> </td>
+                <td class="buttonalign">
+                    <div class="btnContainer floatRight searchalign">
+                        <input type="submit" value="Search" id="btnRequisitionSearch" />
+                    </div>
+                </td>
+                <td class="dspace"> </td>
+                
+
+                <td class="buttonalign">
+                    <div class="btnContainer floatRight">
+                        <input type="reset" value="Clear" id="btnRequisitionSearchClear" />
+                    </div>
+
+                </td>
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+                <td></td>
+                <td class="dspace"> </td>
+                <td colspan="4">
+                    <label id="lblReqDateError" style="color:red;"></label>
+                </td>
+            </tr>
+            <tr class="blankrow1"></tr>
+        </table>
+        <br />
+        <label id="FilteredSearchColumns" class="display-filters"></label>       
+        @*<div class="btnContainer floatRight">
+            <input type="submit" id="btnRequisitionSearchExport" class="excel_btn" />
+
+        </div>
+        <br /><br />*@      
+        @(Html.Kendo().Grid<RequisitionSearch>().Name("grdRequisitionSearch").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click("requisitions.selectRequisition")).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+                            columns.Bound(s => s.RequisitionId).Width(ISS.Common.LOVConstants.Width.Medium1);
+                            columns.Bound(s => s.ProdStatus).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.PlanningContact).Width(ISS.Common.LOVConstants.Width.Medium1);
+                            //columns.Bound(s => s.CreateDate).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.CreateDate).ClientTemplate("#= kendo.toString(CreateDate, 'd')  #").Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.ReqStatus).Width(ISS.Common.LOVConstants.Width.Medium1);
+                            columns.Bound(s => s.BusUnit).Width(ISS.Common.LOVConstants.Width.Small2);
+                            columns.Bound(s => s.VendorName).Width(ISS.Common.LOVConstants.Width.Large1);
+                            columns.Bound(s => s.VenCity).Width(ISS.Common.LOVConstants.Width.Large1);
+                            columns.Bound(s => s.VenCountry).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorNo).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorLoc).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.Locked).ClientTemplate("#= kendo.toString(Locked, 'd')  #").Width(ISS.Common.LOVConstants.Width.Small3);
+                        }
+                        )
+                          .ToolBar(toolbar =>
+                                                        {
+                                                            toolbar.Excel();
+                                                        })
+                                                        .Excel(excel => excel
+                                                            .FileName("RequisitionSearchDetails" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                            .Filterable(true)
+                                                            .AllPages(true)
+                                                         )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        })
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                        .Filterable(filterable => filterable
+                            .Extra(false)
+                            .Operators(operators => operators
+                                .ForString(str => ISS.Web.Helpers.FilterHelper.FilterString(str))
+                                .ForNumber(num => ISS.Web.Helpers.FilterHelper.FilterNumber(num))
+                                .ForDate(dte => ISS.Web.Helpers.FilterHelper.FilterDate(dte))
+
+                            )
+                        )
+                        .Sortable()
+                        .Events(e => e.DataBound("requisitions.rowDataBound"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Url("../Order/RequisitionSearch");
+                                read.Data("requisitions.searchDataRequisition");
+
+                            })
+
+
+                        )
+
+        )
+    </div>
+}
+
+
+<style>
+    #requisitionSearch .k-grid-content {
+        min-height: 100px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        white-space: normal;
+    }
+
+    #requisitionSearch .uppercase {
+        text-transform: uppercase;
+    }
+</style>  

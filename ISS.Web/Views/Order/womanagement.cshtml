@@ -1,0 +1,118 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.WOManagementSearch
+
+@{
+    ViewBag.Title = "Work Order Management";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/WOM" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+
+    ISS.common.menuEvent = function () {
+        setGrid();
+        if(!gridWOM.dataSource._requestInProgress)
+            gridWOM.refresh();
+    }
+    $(document).ready(function () {
+
+        WOM.docWOMReady();
+        WOM.const.url = '@Url.Action("WOManagement","order")'
+        WOM.const.urlProdOrder = '@Url.Action("getProductionOrders", "order")'
+        //Asif 10/9/2018 To Add Selling Sku popup while clicking in Selling Style in WOM screen
+        WOM.const.urlSellsku = '@Url.Action("getSellingSku", "order")'
+        WOM.const.urlProdOrderLbs = '@Url.Action("getProductionOrdersLBS", "order")'
+        WOM.const.urlPipelineDates = '@Url.Action("getPipelineDates", "order")'
+        WOM.const.urlMachineCodes = '@Url.Action("PopulateMachineTypesBySuperOrder", "order")'
+        WOM.const.urlGetAlternateId = '@Url.Action("getAlternateId", "order")'
+        WOM.const.urlPopulateCutPathTxtPath = '@Url.Action("PopulateCutPathTxtPathBySuperOrder", "order")'
+        WOM.const.urlPFSDetails = '@Url.Action("GetPFSDetail", "order")'
+        WOM.const.urlGetCreateWO = '@Url.Action("CreateWorkOrder", "order")'
+        WOM.const.urlGetMfgPath = '@Url.Action("GetMFGPathId", "order")'
+
+
+
+        WOM.const.CreatedBy = '@ViewBag.UserId';
+        WOM.const.CreatedOn = '@DateTime.Now.ToString(LOVConstants.DateFormatDisplay)'
+
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+         {
+             <text>
+        setTimeout(function(){
+            if (typeof(buAr )!='undefined') {
+                var bu = $("#BusinessUnit").data("kendoMultiSelect");
+                bu.value(buAr.split(','));
+            }
+            WOM.loadWOMGrid()
+        }, 1000);
+        location.hash = 'autoLoad'
+        </text>
+
+         }
+    });
+
+    function getFilterStaticVal(){
+        return { SuggestedLots: @Model.SuggestedLots.ToString().ToLower(), SpillOver: @Model.SpillOver.ToString().ToLower(), LockedLots: @Model.LockedLots.ToString().ToLower(),
+            ReleasedLotsThisWeek: @Model.ReleasedLotsThisWeek.ToString().ToLower(), CustomerOrders: @Model.CustomerOrders.ToString().ToLower(), Events: @Model.Events.ToString().ToLower(),
+            MaxBuild: @Model.MaxBuild.ToString().ToLower(), TILs: @Model.TILs.ToString().ToLower(), Forecast: @Model.Forecast.ToString().ToLower(), StockTarget: @Model.StockTarget.ToString().ToLower() };
+
+    }
+
+</script>
+
+<style>
+.k-combobox input { 
+    text-transform: uppercase; 
+} 
+.k-grid tr:first-child{
+    padding:0px !important;
+}
+.k-grid-EditItem, .k-grid-DeleteItem, .k-grid-View{
+    padding: 1px 10px 1px !important;
+}
+</style>
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+
+<div class="expand planForm1  form1 width100" id="contentDiv">
+
+    @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Selection Criteria")
+                .Content(@<div>
+                    <div>@Html.Partial("WOMSearch")</div>
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Mass Change")
+                .Content(@<div id="divMassChange">@Html.Partial("WOMMassChange", new  WOMMassChange())</div>).Expanded(false);
+
+
+
+
+            panelbar.Add().Text("Detail").LinkHtmlAttributes(new { @class = "linkDetailspanel" })
+          .Content(@<div id="divWOMDetail">
+                    @Html.Partial("WOMDetail", new WOMDetail() { Views = "Default" })
+
+                        @Html.Partial("WOMEdit", new WOMDetail())
+
+    </div>).Expanded(true);
+
+
+
+        })
+        
+    )
+
+    @*<div class="divDemandPopup" style="display:none;">
+        @Html.Partial("Demandpopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>*@
+    </div>

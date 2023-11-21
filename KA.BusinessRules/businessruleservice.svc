@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="ISS.BusinessRules.BusinessRuleService" CodeBehind="BusinessRuleService.svc.cs" %>

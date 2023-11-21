@@ -1,0 +1,85 @@
+﻿@using ISS.Core.Model.Textiles;
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Common;
+
+@model  System.Data.DataTable
+@*<div class="btnContainer floatRight">
+    <input type="submit" id="btnYarnllocationExport" class="excel_btn" name="gridValue" value="yarnitem" />
+</div>
+<br /><br />*@
+@(Html.Kendo().Grid(Model)
+                  .Name("grdYarnDetails").HtmlAttributes(new { @class = "kgridheight" })
+              .Columns(columns =>
+               {
+                   foreach (System.Data.DataColumn column in Model.Columns)
+                   {
+                       var c = columns.Bound(column.DataType, column.ColumnName).Width(LOVConstants.Width.Medium2);
+
+                       switch(column.ColumnName.ToLower())
+                       {
+                           case "yarnitem":
+                               c.Title("Yarn Item");
+                               c.Width(300);                            
+                               break;
+                           case "suggested":
+                               c.HtmlAttributes(new {style = "color:blue" });
+                               c.HtmlAttributes(new {@class = "ob-right"  });
+                               break;
+                           case "locked":
+                               c.HtmlAttributes(new { style = "color:darkgreen" });
+                               c.HtmlAttributes(new { @class = "ob-right" });
+                               break;
+                           case "released":
+                           case "adj":
+                           case "alloc":
+                               c.HtmlAttributes(new { style = "color:purple" });
+                               c.HtmlAttributes(new { @class = "ob-right" });
+                               break;
+                          case "total":
+                          case "net":
+                               c.HtmlAttributes(new { @class = "ob-right" });
+                               break;                        
+                       }
+
+                       if ((column.ColumnName == "Suggested" || column.ColumnName == "Locked" || column.ColumnName == "Released"))
+                       {
+                           //c.ClientTemplate("<a class='linki2 lnkTextiles'  href='javascript:void(0)' > #=" + (column.ColumnName) + "# </a>");
+                           c.ClientTemplate("<a data-yarn=" + column.ColumnName + " class='linki2 lnkTextiles'  href='javascript:void(0)' > #if (" + (column.ColumnName) + " == null) {# #=''# #} else {# #=" + (column.ColumnName) + "# #}# </a>");    
+                           
+                       }                                            
+                   }
+               }
+                    )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                })
+                     .ToolBar(toolbar =>
+                                      {
+                                          toolbar.Excel();
+                                      })
+                            .Excel(excel => excel
+                                           .FileName("TextileYarnItemAllocations" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                           .Filterable(true)
+                                           .AllPages(true)
+                                   )
+                .Resizable(resizing => resizing.Columns(true))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Model(model =>
+                            {
+                                foreach (System.Data.DataColumn column in Model.Columns)
+                                {
+                                    model.Field(column.ColumnName, column.DataType);
+                                }
+                            })
+                    .ServerOperation(false)                   
+                   
+                )
+                   .Events(ev => ev.DataBound("textiles.onYarnItemDataBound").ExcelExport("textiles.exportYarnkendo"))
+                   
+)
+
+

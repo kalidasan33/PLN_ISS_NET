@@ -1,0 +1,18 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetSkuSizes", "Order", new { area = "" }).Type(HttpVerbs.Post).Data("retrieveSizeData");
+      }).ServerFiltering(false);
+  })
+      .DataValueField("Size")
+      .DataTextField("SizeDesc")
+  .Events(e =>
+  {
+    e.Select("onSizeSelect");
+  })
+)

@@ -1,0 +1,3 @@
+﻿@(
+ Html.Kendo().TextBoxFor(m => m).HtmlAttributes(new { @onfocusout = "WOM.SellingSValidate(this)", @ondblclick = "WOM.StyleSearchClick(this)" , style="text-transform:uppercase" })
+)

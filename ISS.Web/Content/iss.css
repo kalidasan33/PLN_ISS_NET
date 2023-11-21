@@ -1,0 +1,901 @@
+﻿@charset "utf-8";
+/* CSS Document */
+
+.header {
+	background-color:#dadada;
+	border-bottom:solid 1px #9a928f;
+}
+.logo {
+	background: url(../images/hbiLogo.png) no-repeat;
+	height: 57px;
+}
+.ISSTitle {	
+	font-size: 14px;
+	color: #000;
+	margin-right: 60px;
+	margin-top: 15px;
+}
+
+.ISSsubTitle{
+   margin-top: 17px;
+  font-size: 25px;
+  letter-spacing: 0.05em;
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  color: #5877A7;
+  text-shadow: 0px 1px 0px rgba(255,255,255,0.50);
+  width: 500px;
+  float: left;
+  margin-left: 351px;
+}
+
+.navRight {
+	width: 80%;
+}
+.navLeft {
+	width: 165px;
+	height: 100%;
+	/*background-color:#abbcd4;*/
+	background-color:#c6d6ec;
+}
+.navLeft li {
+	background: url(../images/navBg.png) repeat-x;
+	height: 45px;
+	font-size:17px;
+	padding-left: 20px;
+	border-bottom:solid 1px #7f9eca;
+    border-right: solid 1px #7f9eca;
+}
+.navLeft li:hover, .navLeft li.active {
+	background: url(../images/navBgHover.png) repeat-x;
+	border-bottom:solid 1px #6D93C5;
+	color: #1B2676;
+}
+.navLeft li.active {
+	background: url(../images/navBgHover.png) repeat-x;
+	border-bottom:solid 1px #6D93C5;
+	font-size:16px;
+	font-weight:bold;
+	color: #000 !important;
+}
+.navLeft li a {
+	color: #000;
+	text-decoration:none;
+	line-height:45px;
+}
+.navLeft li a:hover {
+	color: #1B2676;
+	
+}
+.contentTitle {
+	font-size: 22px;
+	color: #5679A9;
+	margin: 15px 0 10px 0;
+}
+.planForm {
+	font-size: 11pt;
+	color: #2a2a2a;
+}
+.planForm td {
+	padding-left: 2px;
+}
+
+.tabIcons li {
+	display: inline;
+	margin-right:10px;
+}
+.planOrderTitle {
+	background-color: #d0d0d0;
+}
+.planOrderTitle td {
+	height: 28px;
+	line-height:20px;
+	padding: 3px;
+}
+
+.alternationRow td {
+	background-color:#e4e4e4
+}
+.planOrderDetails {
+	width: 100%;
+}
+.planOrderDetails td {
+	height: 30px;
+	border-right: solid 1px #c4c4c4;
+	border-bottom: solid 1px #c4c4c4;
+}
+
+.firstDetail {
+	border-left: solid 1px #c4c4c4;
+}
+.contentNav {
+	margin-top: 20px;
+}
+.contentNav li{
+	display: inline;
+}
+
+.btnContainer {
+	height:35px;
+	text-align: center;
+}
+.btnContainer .excel_btn:hover{
+    background: url(../images/icons-excel-large.jpg) no-repeat center !important;
+    box-shadow: 0px 0px 16px 3px #ccc;
+}
+.btnContainer a, input[type="submit"],input[type="reset"],input[type="button"]{
+	background: url(../images/navBg.png) repeat;
+	border: solid 1px #5679A9;
+	border-radius: 5px;
+	padding: 0 15px;
+	text-decoration:none;
+	/*color: #000;*/
+	line-height:35px;
+	display: inline-block;
+	text-align: center;
+	float:left;
+	margin: 0 0px 0 10px;
+    cursor: pointer; 
+}
+
+.btnContainer  input[type="submit"],input[type="reset"],input[type="button"]{
+		height:35px;
+}
+
+
+.btnContainer a:hover,.showpopupMsgOk:focus,.showpopupMsgCancel:focus, input[type="submit"]:hover,input[type="reset"],input[type="button"]:hover{
+	background: url(../images/navBgHover.png) repeat !important;	  
+	color: #1B2676;	 
+}
+
+.topNavIcons li{
+	padding-top: 25px;
+	display:inline-block;
+	margin-right: 15px;
+	text-align:center;
+	cursor:pointer;
+	
+}
+.topNavIcons li:hover {
+	color: #000;
+}
+.topNavIcons a{
+	text-decoration:none;
+	color: #33579b;
+}
+
+.topNavIcons a:hover{
+	text-decoration:none;
+	color: #000;
+}
+
+
+.read {
+	background:url(../images/iconRead.png) no-repeat;
+}
+
+.clear {
+	background:url(../images/iconClear.png) no-repeat;
+}
+.export {
+	background:url(../images/iconExport.png) no-repeat;
+}
+
+.exit {
+	background:url(../images/iconExit.png) no-repeat;
+}
+
+
+.contentSection {
+	min-width: 985px;
+	overflow-x: auto;
+}
+
+.footer{
+	margin: 20px 0;
+}
+
+
+.k-multiselect-wrap
+{
+    position: relative;
+  border-width: 0;
+  border-style: solid;
+  border-radius: 4px;
+  border-color: #c5c5c5;
+  background-color: #FFF;
+  min-height: 2.3em !important;
+}
+
+/*.k-dropdown, .k-selectbox, .k-textbox{
+    position: relative;
+    display: inline-block;
+    width: 11.5em !important;
+    overflow: visible;
+    border-width: 0;
+    vertical-align: middle;
+    min-height: 1.6em !important;
+}*/
+
+/*General Styles*/
+input, select {
+	/*height: 20px;*/
+	/*border:solid 1px #b2b2b2;*/
+	border: 1px solid #DADADA;
+	font-size: 11pt;
+	color: #2a2a2a;
+}
+
+select {
+	height: 32px;
+}
+input.checkbox {
+	height: 15px;
+	border: none;	
+}
+.floatRight{
+	float: right;
+}
+.floatLeft{
+	float: left;
+}
+.clear {
+	clear: both;
+}
+.marginLeft25 {
+	margin-left: 25px;
+}
+.paddingLeft50 {
+	padding-left: 30px;
+}
+.width85Per {
+	width: 85%;
+}
+.width75Per {
+	width: 75%;
+}
+.width75Per0 {
+
+}
+
+.width33per {
+	width: 33%;
+}
+.width313 {
+	width: 312px;
+}
+
+.textRight {
+	text-align:right;
+}
+.textCenter {
+	text-align:center;
+}
+.width175 {
+	width: 175px;
+}
+.width78 {
+	width: 78px;
+}
+.height700 {
+	height: 700px;
+	
+}
+.planForm label {
+	/*width: 125px;*/
+	display:inline-block;
+	text-align:left;
+	margin-bottom: 4px;
+    font-size:12px;
+    margin-left:3px;
+}
+.selectedSizes {
+	/*width: 125px;*/
+	display:inline-block;
+	text-align:left;
+	margin-bottom: 4px;
+    font-size:12px;
+    margin-left:3px;
+   min-width:100px;
+    
+   
+}
+.planForm div {
+	margin-bottom: 0px;
+}
+.border {
+	border: solid 1px #f00;
+}
+.inlineBlock {
+	display: inline-block;
+}
+
+
+.showpopupMsgOk {
+    overflow: hidden !important;
+}
+
+.popcontent .content {
+    
+}
+.popcontent .k-button {
+    /*float: right;*/
+    margin: 40px 37px 0  0;
+    min-width:90px;
+    width: auto;
+    height: 40px;
+}
+
+
+ .ttab {
+        margin-left:22px;
+        margin-top:10px;
+        margin-bottom:10px;
+        border:1px;
+        padding:5px;
+        /*width:600px;*/
+    }
+
+    .ttab tr {
+    }
+    .ttab tr td {
+  vertical-align: top;
+}
+    .dspace {
+        width:40px;
+    }
+    .dspace2 {
+        width:15px;
+    }
+
+     .fspace {
+        width:20px;
+    }
+
+     .espace {
+        width:20px;
+    }
+.blankrow1{
+    height:10px;
+}
+
+.space {
+    height: 12px;
+}
+
+.viewic1 {
+ 	margin: 20px 0;  background: url('../Images/view.png') no-repeat;
+    padding: 0 25px 6px 0;
+  text-indent: -222px;
+}
+
+.messegealert-info {
+    display: block;
+    width: 95%;
+    margin: 20px 3% 0 3%;
+    margin-top: 20px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    background: lightgoldenrodyellow;
+    background-position: 10px 10px;
+    border: 1px solid darkgray;
+    color: #082B33;
+    padding: 10px 0;
+    text-indent: 40px;
+    font-size: 14px;
+}
+
+.order-header {
+        text-align: right;  
+    }
+
+    .highlighted-row {
+        color: red;
+    }
+    .highlighted-rowgreen {
+        color: green;
+    }
+    .deleted-row{
+        background-color: #ffb7a8 !important;
+    }
+    .completed-row{
+         background-color: #91D29C !important;
+    }
+ 
+    .ob-right {
+        text-align: right;
+    }
+.form1 td{
+    padding: 2px 2px 1px 6px !important;
+}
+
+.expmenuitem {    
+  height: auto !important;
+  background: none !important;
+  padding-left: 0px !important;
+  
+}
+
+.expmenuitem ul{
+
+}
+
+.expmenuitem ul li{
+    background:none;
+    border-bottom:none;
+    padding-left: 30px;
+}
+
+  .expmenuitem .active  a   {
+        font-size: 11px !important;
+    }
+    .expmenuitem ul li a {
+        font-size: 12px  ;
+    }
+
+    
+.cb1 {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  background: url(../images/cbunchecked.png);
+  background-repeat: no-repeat;
+  border: none;
+  float: left;
+}
+
+.cb2 {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0px;
+  background: url(../images/cbchecked.png);
+  background-repeat: no-repeat;
+  border: none;
+  float: left;
+}
+
+.lb4 {
+   
+}   
+
+.lb1{
+    padding-bottom:3px;
+    padding-left:10px; 
+    padding-top:0px;
+    font-weight:bold;
+}
+
+a.linki1{
+    text-decoration:none;
+    color:red !important;
+}
+
+a.linki1:hover{
+    text-decoration:none;
+    color:#3868A9 !important;
+    text-decoration: underline;
+}
+
+a.linki2{
+    text-decoration:none;
+    color:#003399 ;
+}
+
+a.linki2:hover{
+    text-decoration:none;
+    color:#1669E6 ;
+    text-decoration: underline;
+}
+
+a.linki3{
+    text-decoration:none;
+    color:#0000FF ;
+}
+
+a.linki3:hover{
+    text-decoration:none;
+    color:#970080 ;
+    text-decoration: underline;
+}
+
+.k-window-titlebar {
+  height: 26px !important;
+  position: relative  !important;
+}
+
+.k-window-title {
+    color: #5679A9;
+      font-weight: bold;
+      margin-top:4px;
+}
+
+
+/* Menu fixer */
+
+ 
+
+.menufixer
+{   
+    position:absolute;
+    float:left;    
+	margin:0 10px 0 166px;
+	width:15px;
+    cursor:pointer;
+	height:100%;
+	background:url(../images/toleft.png) no-repeat center;
+	z-index:10000;	  
+	/*background-color: #F7F7F7;*/
+    background-size: 19px 26px;
+}
+.menudisp
+{
+     display:none;
+}
+ .collapsed
+{
+   background:url(../images/toright.png) no-repeat center ;
+}
+ /* Menu fixer */
+
+.buttonalign {
+    vertical-align: bottom;
+}
+
+.buttonalign a, .buttonalign input[type="submit"], .buttonalign input[type="reset"]{	 
+	padding: 0 7px !important;	 
+	margin: 0 !important;
+}
+
+.widtht{
+    width:37px !important;
+} 
+
+.widths{
+    width:70px !important;
+}
+.widthm{
+    width:100px !important;
+}
+.widthma{
+    width:110px !important;
+}
+.widthm1{
+    width:125px !important;
+}
+.widthm2{
+    width:160px !important;
+}
+
+.mndtastx:after {
+  content: " *";
+  /*font-weight: normal !important;*/
+  color: red !important;
+  /*font-family: Verdana, Geneva, sans-serif !important;
+  font-size: 13px !important;*/
+}
+ 
+
+.excel_btn {
+   background:url(../images/icons-excel-large.jpg) no-repeat center !important;
+   float:none !important;
+  color:transparent !important;
+  border:hidden !important;
+  line-height:26px !important;
+  margin: 0 0 0 0 !important;
+  padding: 0 0 0 0 !important;
+}
+ 
+ .modal {
+    display:    none;
+    position:   fixed;
+    z-index:    10050;
+    opacity: 0.7; 
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                 url('kendo/2014.2.1008/Bootstrap/loading-image.gif')
+                50% 50% 
+                no-repeat;
+}
+ 
+body.loading { 
+overflow: hidden; 
+} 
+
+ 
+body.loading .modal { 
+display: block; 
+}
+
+
+#ReqOrderDetails .k-grid-content ,#grdWOM .k-grid-content {
+        min-height:100px;
+    }
+
+#tblExpandView
+{
+      table-layout: fixed;
+        width: 100%;
+  margin: 0;
+  border-spacing: 0;
+  empty-cells: show;
+  border-width: 0;
+  outline: 0;
+    
+}
+
+#tblExpandView th{
+    border-radius: 3px 0 0 0;
+      overflow: hidden;
+  border-style: solid;
+  border-width: 1px 1px 1px 1px;
+  padding: .5em .6em .4em .6em;
+  font-weight: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+    line-height: 1;
+  font-size: 11.6px;
+    border-color: #ccc;
+    background-image: none;
+  background-position: 50% 50%;
+  background-color: #f5f5f5;
+}
+
+#tblExpandView tr{
+      background-clip: border-box;
+      box-sizing: content-box;
+        margin: 0;
+  padding: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  empty-cells: show;
+  outline: 0;
+  color: #333;
+  background-color: #fff;
+}
+
+#tblExpandView td{
+    border-style: solid;
+  border-color: #ccc;
+  border-width: 1px 1px 1px 1px;
+    overflow: hidden;
+  line-height: 1.6em;
+  font-size: 11.6px;
+}
+
+.k-grid-header th.k-header, .k-filter-row th { 
+white-space:normal !important; 
+}
+
+.display-filters {
+    padding: 8px 0 0 5px;
+    color: red;
+    display: block;
+}
+
+.k-widget.k-tooltip-validation {
+  border-color: #ffb7a8 !important;
+  background-color: #ffe0d9 !important;
+  color: red !important;
+}
+
+.custTool{
+       color: black;
+}
+.custTool tr{
+    height: 22px;
+}
+
+.custErrTool{
+       border-color: #ffb7a8 !important;
+  background-color: #ffe0d9 !important;
+  color: red !important;
+}
+.errToolCus {
+    display: block;   
+    color: red;
+}
+
+ .k-icon.k-warning{
+  background-image: url('../images/error_icon.gif') !important;
+   background-position: 0 !important;
+}.k-callout-s {
+  border-top-color: #ffb7a8 !important;
+}
+
+
+.k-tooltip-content {  
+  color: red;
+  background: #fff !important;
+  border-color: #ffb7a8 !important;
+  
+}
+.k-widget.k-tooltip {
+  border-color: #ffb7a8 !important;
+  background-color: #fff !important;
+   
+}
+
+  .k-callout-n {
+   border-bottom-color: #ffe0d9 !important; 
+}
+   .k-i-undo {
+  background-position: -64px -160px;
+}
+    
+  .k-grid-EditItem,  .k-grid-DeleteItem, .k-grid-UndoChange {
+    min-width: 4px !important; 
+}
+
+.workorder-tooltip {
+   border:1px solid black;
+}
+
+    .workorder-tooltip td {
+         border:1px solid black;
+         padding:2px;
+    }
+
+     .workorder-tooltip tr {
+         border:1px solid black;
+         padding:2px;
+    }
+
+     .workorder-tooltip thead td {
+         border:1px solid black;
+         padding:2px;
+         font-weight:bold;
+         background-color:lightgray;
+    }
+
+     .datefordis{
+           font-style: italic;
+  font-size: 11px;
+     }
+
+.mutliSkuNote-tooltip {
+    white-space:normal;
+}
+
+     .fieldbold{
+         font-weight:bold;
+    color:green;
+}
+.fieldblue{
+    color:blue;
+     }
+
+/*Below classes are for setting various font colors for textboxes USE CONTROLName.addClass('ClassName') for adding this classes to TextBoxes*/
+.fontred{
+   color:red !important;
+     }
+.fontblue{
+   color:blue !important;
+     }
+.fontgreen{
+   color:green !important;
+     }
+
+   .norecords{
+       color:red;
+       padding-left:25px;
+       display:block
+   } 
+
+   .panelbottom{
+       padding-bottom: 20px;
+   }
+.loadMessage {
+    display: block;
+    color: green;
+}
+
+/* WOM tool tip Filter grid*/
+#filtergrid1_tt_active{
+    height:auto !important;
+}
+
+#filtergrid1_tt_active .k-tooltip-content{
+    display:inline !important;
+}
+
+.k-notification.k-notification-info {   
+    color: #000 !important;    
+}
+
+#TotalDozens_validationMessage {
+    display:block;
+}
+
+.k-combobox .k-select, .k-numerictextbox .k-select {
+    border-right: 1px solid #ccc !important;
+    padding: 1px;
+}
+
+/*Progress Bar*/
+
+.pbModal {
+    display:    none;
+    position:   fixed;
+    z-index:    10050;
+    /*opacity: 0.7;*/ 
+    height:     100%;
+    width:      100%;
+    top: 0;
+    left: 0;
+    /*background:#000;*/
+    background-color: rgba(0,0,0,0.5);
+}
+ 
+body.Pbloading { 
+overflow: hidden; 
+} 
+
+ 
+body.Pbloading .pbModal { 
+display: block; 
+}
+
+/*.k-progressbar {
+    width: 800px;
+    height: 100px;
+}*/
+
+
+#progressbar {
+    margin-top: 45%; 
+    position:relative;
+        display: block;
+}
+
+.pbDiv {
+    background-color:white;
+    height: 85px;
+    display: block;
+    width: 353px;
+}
+
+.k-combobox input { 
+    text-transform: uppercase; 
+} 
+
+.kgridheight .k-grid-content{
+        min-height:100px;
+        max-height:700px;
+    }
+
+.kgridheightsmall .k-grid-content{
+        min-height:100px;
+        max-height:450px;
+    }
+
+#grdWOM th.k-header, .k-filter-row th {
+        white-space:normal !important;
+    }
+
+.k-pager-info.k-label{
+
+    color:black;
+}
+
+#grdWOM .k-state-selected {
+
+    background-color: lightblue;
+
+    color: #428bca;
+
+}
+
+#grdWOM table tbody tr.k-state-selected:hover {
+
+    background: lightblue;
+
+    color: black;
+    
+}

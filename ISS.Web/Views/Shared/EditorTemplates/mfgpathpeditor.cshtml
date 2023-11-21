@@ -1,0 +1,12 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetMFGPathIdDD", "Order").Type(HttpVerbs.Post).Data("WOM.MFGFilterData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("MfgPathId")
+  .DataTextField("SewPlt")
+  .Events(e => e.Change("WOM.MfgPathChange"))
+)

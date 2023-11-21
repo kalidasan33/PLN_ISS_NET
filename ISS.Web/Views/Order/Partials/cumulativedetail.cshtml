@@ -1,0 +1,49 @@
+﻿@using ISS.Web.Helpers;
+@using ISS.Common;
+@model ISS.Core.Model.Order.WorkOrderCumulative
+
+
+
+@using (Html.BeginForm("GetCumulative", "Order", FormMethod.Post, new { Id = "frmCum" }))
+{
+    <div>
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Cumulative Total for Display Orders")
+            .Content(@<div>
+                    @(Html.Kendo().Grid<ISS.Core.Model.Order.WorkOrderCumulative>().Name("grdwrkOrderCumulative").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+        columns =>
+        {
+            columns.Bound(s => s.CumulativeId).Width(LOVConstants.Width.Small1).Hidden();
+            columns.Bound(s => s.LevelInd).Width(LOVConstants.Width.Small1).Hidden();
+            columns.Bound(s => s.IsHide).Width(LOVConstants.Width.Small1).Hidden();
+            columns.Bound(s => s.StyleCode).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.ColorDyeCode).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.AttributeCompCode).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.Size).Width(LOVConstants.Width.Small2);
+            columns.Bound(s => s.Revision).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.Dozens).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.TotalDozens).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.Lbs).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.HiddenSizeDes).Width(LOVConstants.Width.Small3).Hidden();
+            columns.Bound(s => s.Merged).Width(LOVConstants.Width.Small3).Hidden();
+       
+        })
+            .Events(e => e.DataBound("WO.onCumulativeDataBound"))
+                    .Scrollable(scroll =>
+        {
+            scroll.Enabled(true);
+            scroll.Height("auto");
+        })
+        )
+
+
+                </div>).Expanded(true);
+        })
+
+        )
+    </div>
+}
+

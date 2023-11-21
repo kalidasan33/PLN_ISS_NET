@@ -1,0 +1,15 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetRevisionNumbers", "Order").Type(HttpVerbs.Post).Data("retrieveUomData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Rev")
+  .DataTextField("RevDesc")
+  .Events(e =>
+  {
+      e.Select("onRevSelect");
+  })
+)

@@ -1,0 +1,63 @@
+﻿@using Kendo.Mvc.UI;
+@using ISS.Core.Model.Information;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Common;
+
+
+@model ExceptionDetail
+
+ 
+
+
+@(Html.Kendo().Grid<ExceptionDetail>().Name("grdExceptionDetails").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.SuperOrder).Width(100);
+
+                    columns.Bound(p => p.Style).Width(80).FooterTemplate(ftemp =>
+                        { 
+                        
+                        });
+                    columns.Bound(p => p.Color).Width(80); 
+                    columns.Bound(p => p.Attribute).Width(80);
+                    columns.Bound(p => p.SizeShortDesc).Width(80);                  
+                    columns.Bound(p => p.Reason).HtmlAttributes(new { style = "color:red;" });
+                    
+                }
+                )
+                
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                            
+                })
+                .Resizable(resizing => resizing.Columns(true))
+                .Sortable()
+                .Filterable(filterable => filterable
+                            .Extra(false)
+                            .Operators(operators => operators
+                                .ForString(str => str.Clear()
+                                    .StartsWith("Starts with")
+                                    .IsEqualTo("Is equal to")
+                                    .IsNotEqualTo("Is not equal to")
+                                )
+                            )
+                            )
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)                    
+                    .Read(read =>
+                    {
+                        read.Url("ExceptionDetails");
+                       // read.Action("ExceptionDetails", "Information");
+                        read.Data("information.searchDataExceptionDetails");
+                        
+                    })                   
+                )
+                
+                 
+)
+    
+ 

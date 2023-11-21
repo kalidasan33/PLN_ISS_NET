@@ -1,0 +1,204 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using KA.Core.Model.MaterialSupply;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model KA.Core.Model.MaterialSupply.MaterialBlankSupplySearch
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "Projected Available Balance";
+}
+@section scripts{
+    @Scripts.Render("~/bundles/Supply" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        MS.docBlankMSReady();
+
+        MS.const.urlSaveMBSdata = '@Url.Action("MaterialBlankSupply", "BlankSupply", new { area = "ka" })'
+        MS.const.urlGetColor = '@Url.Action("GetColorCodes", "order", new { area = "" })'
+        MS.const.urlGetSizes = '@Url.Action("GetSizes", "order", new { area = "" })'
+
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+            <text>
+        setTimeout(function () {
+            MS.loadForAWOM('@Model.Style', '@Model.Color', '@Model.Attribute', '@Model.SizeCD');
+            //MS.MaterialSupplySearch();
+        }, 100);
+        setTimeout(function () {
+            @*MS.loadForAWOM('@Model.Style', '@Model.Color', '@Model.Attribute', '@Model.SizeCD');*@
+            MS.MaterialSupplySearch();
+        }, 1000);
+        location.hash = 'autoLoad'
+        </text>
+
+        }
+    });
+</script>
+
+
+@using (Html.BeginForm("ExportPABDetails", "../BlankSupply", FormMethod.Post, new { Id = "frmSupply" }))
+{
+
+
+    @Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.CustomLabelFor(d => d.Style)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.CustomLabelFor(d => d.Color)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.CustomLabelFor(d => d.Attribute)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.CustomLabelFor(d => d.SizeCD) 
+                                @*@Html.HiddenFor(d => d.SizeCD)*@
+                            </td>
+                            
+                            <td class="dspace"> </td>
+                            <td>@Html.CustomLabelFor(d => d.DC)</td>
+                            <td class="dspace"> </td>
+                               
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.Style)
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @*@Html.Kendo().TextBoxFor(d => d.Color)*@
+                                @(Html.Kendo().ComboBoxFor(d => d.Color).Filter(FilterType.StartsWith)
+                                  .DataValueField("Color")
+                                  .DataTextField("ColorName")
+                                    .Events(e =>
+                                    {
+                                        e.Change("MS.onColorChange");
+                                        //e.DataBound("WOM.onColorBound");
+                                    })
+                                )
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @*@Html.Kendo().TextBoxFor(d => d.Attribute)*@
+                                @(Html.Kendo().ComboBoxFor(d => d.Attribute).Filter(FilterType.StartsWith)
+                                      .DataValueField("Attribute")
+                                      .DataTextField("Attribute")
+                                        .Events(e =>
+                                        {
+
+                                            e.Change("MS.onAttributeChange");
+                                            //e.DataBound("MS.onAttrBound");
+
+                                        })
+                                )
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <button class="k-button" onclick="return ISS.common.multiselectAll('SizeCD', 'Size')" style="font-size:10px;">Select All</button>
+                                <button class="k-button" onclick="return ISS.common.multiunselectAll('SizeCD')" style="font-size:10px;">UnSelect All</button>
+                                @Html.Hidden("AllSizes")
+                                @(Html.Kendo().MultiSelectFor(d => d.SizeCD)
+                                    .Placeholder("All Sizes...")
+                                    .AutoClose(false)
+                                    .Filter(FilterType.StartsWith)
+                                    .HtmlAttributes(new { @class = "widthm2" })
+                                    .AutoBind(false)
+                                    .DataValueField("Size")
+                                    .DataTextField("SizeDesc")
+                                      //.Events(e =>
+                                      //{
+                                      //    e.Change("WOM.onSizeChange");
+                                      //})
+                                )
+                                
+                            </td>
+                            <td class="dspace"> </td>
+
+                            <td>
+                                @Html.Hidden("AllDcs")
+                                <button class="k-button" onclick="return ISS.common.multiselectAll('DC', 'DC')" style="font-size:10px;">Select All</button>
+                                <button class="k-button" onclick="return ISS.common.multiunselectAll('DC')" style="font-size:10px;">UnSelect All</button>
+                                @(Html.Kendo().MultiSelectFor(d => d.DC).Placeholder("All DC's...")
+                                        .HtmlAttributes(new { @class = "widthm2" })
+                                                  .Filter(FilterType.StartsWith)
+                                                  .AutoClose(false)
+
+                                                      .DataTextField("DC")
+                                                              .DataValueField("DC")
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                    .ServerFiltering(false)
+                                                                    .Type("aspnetmvc-ajax")
+                                                                    .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetDC", "BlankSupply");
+                                                                    })
+                                                                    .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        })
+                                )
+                                
+                            </td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td colspan ="4">
+                                @Html.CheckBoxFor(d => d.IncludeSuggLots) @Html.CustomLabelFor(d => d.IncludeSuggLots)
+                            </td>
+                            <td colspan="2">
+                                @Html.CheckBoxFor(d => d.ShowDz) @Html.CustomLabelFor(d => d.ShowDz)
+                            </td>
+                            <td colspan="3">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="btnSupplySearch" />
+                                    <input type="reset" value="Clear" id="btnSupplyClear" />
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                              
+                              
+                              
+                </div>).Expanded(true);
+            panelbar.Add().Text("Search Results")
+                .Content(@<div id="displayResults">                   
+                    
+                              <div class="btnContainer floatLeft" style="margin-left: 20px;margin-top: 9px;">
+                                  @*<input type="submit" id="btnPABExport" class="excel_btn" />*@
+                                  <button class="k-button k-button-icontext k-grid-excel" id="btnPABExport" type="submit"><span class="k-icon k-i-excel"></span>Export to Excel</button>
+
+                              </div>
+                              <br /><br /><br />
+                              @Html.Partial("PABDetailsGrid", new List<Dictionary<string, dynamic>>())
+
+
+                </div>).Expanded(true);
+        })
+        )
+    </div>
+}
+<style type="text/css">
+    .k-multiselect input {
+        text-transform: uppercase;
+    }
+</style>

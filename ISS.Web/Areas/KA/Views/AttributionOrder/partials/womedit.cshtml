@@ -1,0 +1,264 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+@model ISS.Core.Model.Order.WOMDetail
+
+<style>
+    .WOMEditor{
+        max-width:900px;
+    }
+  .WOMEditor  .k-textbox , .WOMEditor .k-dropdown, .WOMEditor .k-datepicker, .WOMEditor .k-numerictextbox{
+      width:130px !important;
+  }
+</style>
+<div class="WOMEditor" style="display   :none;">
+    @using (Html.BeginForm("WOManagement", "Order", FormMethod.Post, new { Id = "frmWOMEdit" }))
+    {
+        
+       
+         
+        @Html.Hidden("AssortCode");
+        @Html.Hidden("PrimaryDC");
+        @Html.Hidden("OrderDetailId"); 
+        @Html.Hidden("IsSKUChange");
+        @Html.Hidden("BOMUpdate");
+        @Html.Hidden("OriginTypeCode");
+        @Html.Hidden("MFGPlant");
+        @Html.Hidden("BusinessUnit");
+        <table class="ttab">
+            <tr class="blankrow1"></tr>
+            <tr>
+
+                <td>
+                    @Html.CustomLabelFor(d => d.OrderStatus)
+
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @{
+        var listOrderStatus = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Suggested.ToString(),
+                                    Value =ProductionStatus.Suggested.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Locked.ToString(),
+                                    Value =ProductionStatus.Locked.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Released.ToString(),
+                                    Value =ProductionStatus.Released.GetDescription()
+                                } ,
+
+
+                            };
+                    }
+                    @(Html.Kendo().DropDownListFor(model => model.OrderStatus)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                        .BindTo(listOrderStatus)
+                        .Events(ev=> ev.Change("WOM.onChangeProdStatus"))        
+            .HtmlAttributes(new { @class = "widthm" })
+
+                    )
+                </td>
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+
+                <td> @Html.CustomLabelFor(d => d.Style)</td>
+                <td class="dspace"> </td>
+
+                <td>@Html.CustomLabelFor(d => d.Color)</td>
+                <td class="dspace"> </td>
+
+                <td>@Html.CustomLabelFor(d => d.Attribute)</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.SizeShortDes)</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.Revision)</td>
+                <td class="dspace"> </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    @Html.Kendo().TextBoxFor(d => d.Style)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                   
+                    @(Html.Kendo().ComboBoxFor(d => d.Color).Filter(FilterType.StartsWith)
+                
+                  .DataValueField("Color")
+                  .DataTextField("ColorName")
+
+                      .Events(e =>
+                      {
+
+                          e.Change("WOM.onColorChange");
+                        
+                          e.DataBound("WOM.onColorBound");
+
+                      })
+                    )
+                   
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @(Html.Kendo().ComboBoxFor(d => d.Attribute).Filter(FilterType.StartsWith)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetAttributeCodes", "../Order").Type(HttpVerbs.Post).Data("WOM.retrieveAttributeData");
+      }).ServerFiltering(false);
+  })
+
+       .DataValueField("Attribute")
+          .DataTextField("Attribute")
+      .Events(e =>
+      {
+
+          e.Change("WOM.onAttributeChange");
+         
+          e.DataBound("WOM.onAttrBound");
+          
+      })
+                    )
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                  
+                    @(Html.Kendo().ComboBoxFor(d => d.Size).Filter(FilterType.StartsWith)
+                      .AutoBind(false)
+                    .DataValueField("Size")
+                    .DataTextField("SizeDesc")
+                          .Events(e =>
+                          {
+                              e.Change("WOM.onSizeChange");
+                          })
+                    )
+                </td>
+                <td class="dspace"> </td>
+
+                <td>
+                    @Html.Kendo().TextBoxFor(d => d.Revision)
+                </td>
+                <td class="dspace"> </td>
+
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+               @*here we can add*@
+                <td>@Html.CustomLabelFor(d => d.QtyEach)</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.CurrDueDate, "datefor")</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.MfgPathId)</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.DcLoc)</td>
+                <td class="dspace"> </td>
+                <td>@Html.CustomLabelFor(d => d.ExpeditePriority)</td>
+                <td class="dspace"> </td>
+            </tr>
+
+            <tr>
+                <td>
+                    @Html.Kendo().TextBoxFor(d => d.QtyEach).HtmlAttributes(new {@class="DozenEaches", @maxlength = "8" })
+
+                </td>
+                <td class="dspace"> </td>
+                <td>@Html.Kendo().DatePickerFor(d => d.CurrDueDate).Events(ev => ev.Change("WOM.validateSEDate")) </td>
+                <td class="dspace"> </td>
+                <td>@Html.Kendo().TextBoxFor(d => d.MfgPathId) </td>
+                <td class="dspace"> </td>
+                <td>@Html.Kendo().TextBoxFor(d => d.DcLoc)</td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.Kendo().NumericTextBoxFor(d => d.ExpeditePriority).Min(0).Max(99).Decimals(0).HtmlAttributes(new { @class = "widths" }).Format("#").Value(50)
+                </td>
+                <td class="dspace"> </td>
+
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+                
+                <td>@Html.CustomLabelFor(d => d.Note)</td>
+                <td class="dspace"> </td>
+                <td></td>
+                <td class="dspace"> </td>
+            </tr>
+
+            <tr>
+               
+                <td colspan="6"> @Html.TextAreaFor(d => d.Note, new { style = "width: 400px; height:60px;" })</td>
+                <td class="dspace"> </td>
+               
+
+            </tr>
+           
+        </table>
+
+        <div class="k-header k-grid-toolbar k-grid-top" style=" padding-left: 30px;">
+            <div class="floatRight">
+                <a class="k-button k-button-icontext saveEdit" href="javascript:void(0)" name="saveGrid"><span class="k-icon k-update"></span>Ok</a>
+                <a class="k-button k-button-icontext EditCancel" href="javascript:void(0)" name="cancelGrid"><span class="k-icon k-cancel"></span>Cancel  </a>
+                </div>
+            </div>
+    }
+</div>
+<div class="divRevSearchPopup" style="display:none;">
+    @{
+    ViewBag.SelectEvent="WOM.showRevDetails";
+    ViewBag.ReadData="WOM.searchRevDetails";
+                     }
+    @Html.Partial("~/Views/Order/Partials/_RevSearch.cshtml",  new ISS.Core.Model.Order.WorkOrderDetail())
+</div>
+
+ <div class="divmfgPathPopup" style="display:none;">
+    @{  
+         ViewBag.SelectEvent = "WOM.showmfgPathDetails"; 
+         ViewBag.ReadData="WOM.retrieveMFGData";
+     }
+        @Html.Partial("~/Views/Order/Partials/_mfPathSearch.cshtml", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+ 
+@*<div class="divPackCodePopup" style="display:none;">
+    @{
+        ViewBag.SelectEvent = "WOM.showPackCodeDetails";
+    }
+    @Html.Partial("~/Views/Order/Partials/_PackCodePopup.cshtml", new ISS.Core.Model.Order.WorkOrderDetail())
+</div>
+
+<div class="divCatCodePopup" style="display:none;">
+    @{
+        ViewBag.SelectEvent = "WOM.showCatCodeDetails";       
+    }
+    @Html.Partial("~/Views/Order/Partials/_CatCodePopup.cshtml", new ISS.Core.Model.Order.WorkOrderDetail())
+</div>*@
+
+<div id="FabricPopup" style="display:none;">
+    <div id="orderDetailgrid"></div>
+     
+    <div id="fabricDetailGrid"></div>
+
+    <div class="k-header k-grid-toolbar k-grid-top " style=" text-align: right;">
+        <a class="k-button k-button-icontext saveGridPFS " href="javascript:void(0)" name="saveGridPFS">
+            <span class="k-icon k-update"></span>Save changes
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a class="k-button k-button-icontext cancelGridPFS " href="javascript:void(0)" name="cancelGridPFS">
+            <span class="k-icon k-cancel"></span>Close
+        </a>
+    </div>
+</div>
+<div class="clear"></div>

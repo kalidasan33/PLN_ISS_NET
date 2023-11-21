@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B96F9030-D448-402C-9F68-883887BF3A24}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ISS.Core</RootNamespace>
+    <AssemblyName>ISS.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug_64_Bit|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug_64_Bit\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Model\Capacity\AggreagtePopup.cs" />
+    <Compile Include="Model\Capacity\AllocationPopup.cs" />
+    <Compile Include="Model\Capacity\AllocationDetail.cs" />
+    <Compile Include="Model\Capacity\CapacitySearch.cs" />
+    <Compile Include="Model\Capacity\CpacityWeek.cs" />
+    <Compile Include="Model\Common\FabricInfo.cs" />
+    <Compile Include="Model\Common\CommonSearch.cs" />
+    <Compile Include="Model\Common\GridColumn.cs" />
+    <Compile Include="Model\Common\GridFilter.cs" />
+    <Compile Include="Model\Common\ModelBase.cs" />
+    <Compile Include="Model\Common\PlantInfo.cs" />
+    <Compile Include="Model\Common\PlanWeek.cs" />
+    <Compile Include="Model\Common\Result.cs" />
+    <Compile Include="Model\Common\SKU.cs" />
+    <Compile Include="Model\Common\ValidateHAADTO.cs" />
+    <Compile Include="Model\Information\BulksToAvyx.cs" />
+    <Compile Include="Model\Information\BulkstoOneSource.cs" />
+    <Compile Include="Model\Information\ExceptionDetail.cs" />
+    <Compile Include="Model\Information\KnightsApparelExpedite.cs" />
+    <Compile Include="Model\Information\StyleException.cs" />
+    <Compile Include="Model\Information\BlownAwayLot.cs" />
+    <Compile Include="Model\Information\SuggestedExceptionDetial.cs" />
+    <Compile Include="Model\Information\WOTextileGroup.cs" />
+    <Compile Include="Model\Information\DCWorkOrder.cs" />
+    <Compile Include="Model\Information\StyleSearch.cs" />
+    <Compile Include="Model\Information\DCWorkOrderSearch.cs" />
+    <Compile Include="Model\Information\SuggestedException.cs" />
+    <Compile Include="Model\Common\Planner.cs" />
+    <Compile Include="Model\Common\WorkCenter.cs" />
+    <Compile Include="Model\Information\Releases.cs" />
+    <Compile Include="Model\Information\ReleasesSearch.cs" />
+    <Compile Include="Model\Order\AttributionMrz.cs" />
+    <Compile Include="Model\Order\CommentNotes.cs" />
+    <Compile Include="Model\Order\CommonDropDownModel.cs" />
+    <Compile Include="Model\Order\DCCode.cs" />
+    <Compile Include="Model\Order\DemandDrivers.cs" />
+    <Compile Include="Model\Order\MultiSKUSizes.cs" />
+    <Compile Include="Model\Order\NetDemand.cs" />
+    <Compile Include="Model\Order\OrderComment.cs" />
+    <Compile Include="Model\Order\SkuViewModel.cs" />
+    <Compile Include="Model\Order\WOMMassChange.cs" />
+    <Compile Include="Model\Order\WOManagementSearch.cs" />
+    <Compile Include="Model\Order\Requisition.cs" />
+    <Compile Include="Model\Order\RequisitionBOM.cs" />
+    <Compile Include="Model\Order\RequisitionDetail.cs" />
+    <Compile Include="Model\Order\RequisitionExpandView.cs" />
+    <Compile Include="Model\Order\RequisitionOrder .cs" />
+    <Compile Include="Model\Order\RequisitionOrderSearch.cs" />
+    <Compile Include="Model\Order\RequisitionSearch.cs" />
+    <Compile Include="Model\Order\SOStyleValidaion.cs" />
+    <Compile Include="Model\Order\SummaryDetails.cs" />
+    <Compile Include="Model\Order\SummaryFilterModal.cs" />
+    <Compile Include="Model\Order\SummaryResult.cs" />
+    <Compile Include="Model\Order\SummarySKU.cs" />
+    <Compile Include="Model\Order\VendorSearch.cs" />
+    <Compile Include="Model\Order\WOMPipeline.cs" />
+    <Compile Include="Model\Order\WorkOrderCumulative.cs" />
+    <Compile Include="Model\Order\WOMDetail.cs" />
+    <Compile Include="Model\Order\WorkOrderDetail.cs" />
+    <Compile Include="Model\Order\WorkOrderFabric.cs" />
+    <Compile Include="Model\Order\WorkOrderHeader.cs" />
+    <Compile Include="Model\Order\WorkOrderTextiles.cs" />
+    <Compile Include="Model\Security\MenuConfiguration.cs" />
+    <Compile Include="Model\Security\UserRoles.cs" />
+    <Compile Include="Model\Textiles\TextileAllocation.cs" />
+    <Compile Include="Model\Textiles\TextileFilterModel.cs" />
+    <Compile Include="Model\Textiles\TextilesSearch.cs" />
+    <Compile Include="Model\Textiles\YarnItem.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources\Messages.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Messages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ISS.Common\ISS.Common.csproj">
+      <Project>{675c4e4d-10ff-4b18-98e3-5e2e06d6fcc0}</Project>
+      <Name>ISS.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

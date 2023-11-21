@@ -1,0 +1,4 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@(@Html.Kendo().NumericTextBox().Min(0).Max(99).Decimals(0).HtmlAttributes(new { @class = "widths" }).Format("#").Value(50)
+)

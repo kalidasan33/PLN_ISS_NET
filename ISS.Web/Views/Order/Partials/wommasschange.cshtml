@@ -1,0 +1,283 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.WOMMassChange
+
+@using (Html.BeginForm("WOManagementMassChange", "Order", FormMethod.Post, new { Id = "frmWOMMassChange" }))
+{
+<table class="ttab">
+    <tr>
+        <td>@Html.CustomLabelFor(d => d.MfgPathId)</td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.CustomLabelFor(d => d.CutPath)
+
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.CustomLabelFor(d => d.Txtpath)</td>
+        <td class="tspace"> </td>
+
+        <td> @Html.CustomLabelFor(d => d.DC)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.Dozen)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.OrderStatusMC)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.Priority)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.CatCD)</td>
+        <td class="tspace"> </td>
+        <td class=""> </td>
+        
+
+    </tr>
+
+
+    <tr>
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.MfgPathId).HtmlAttributes(new { @class = "clsupper widths" })
+            @(Html.Kendo().Button()
+                                            .Name("btnSewPathSearch")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Cut Path</span>")
+            )
+        </td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.CutPath).HtmlAttributes(new { @class = "clsupper widths" })
+            @(Html.Kendo().Button()
+                                            .Name("btnCutPathSearch")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Cut Path</span>")
+            )
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Txtpath).HtmlAttributes(new { @class = "clsupper widths" })</td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.DC).HtmlAttributes(new { @class = "clsupper widths" })</td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Dozen).HtmlAttributes(new { @class = "IntField widths" })</td>
+        <td class="tspace"> </td>
+        <td>
+            @{
+    var listOrderStatus = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Suggested.ToString(),
+                                    Value =ProductionStatus.Suggested.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Locked.ToString(),
+                                    Value =ProductionStatus.Locked.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Released.ToString(),
+                                    Value =ProductionStatus.Released.GetDescription()
+                                } ,
+                                
+
+                            };
+            }
+            @(Html.Kendo().DropDownListFor(model => model.OrderStatusMC)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                        .BindTo(listOrderStatus)
+            .HtmlAttributes(new { @class = "widthm" })
+             .OptionLabel("--Select--")             
+
+            )
+
+
+
+        
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Priority).HtmlAttributes(new { @class = "IntField widths" })</td>
+
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.CatCD).HtmlAttributes(new { @class = "IntField widths" })
+            
+        
+        <td>@(Html.Kendo().Button()
+                                            .Name("btnCatSearch")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Cut Path</span>")
+        ) </td>
+
+        <td class="tspace"> </td>
+        <td class="tspace"> </td>
+
+    </tr>
+    <tr class="blankrow1"></tr>
+    <tr><td class="tspace"> </td><td class="tspace"> </td><td class="tspace"> </td><td colspan="3" style="font-weight: bold;"> Textiles</td><td colspan="4" style="font-weight: bold;"> Garment</td> </tr>
+    <tr>
+        <td>@Html.CustomLabelFor(d => d.DueDateStr)</td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.CustomLabelFor(d => d.MDueDate, "datefor")
+        </td>
+        <td class="tspace"> </td>
+        <td colspan="2">
+            @Html.CustomLabelFor(d => d.MachineMC)
+
+        </td>
+        @*<td class="tspace"> </td>*@
+        
+        @*<td></td>*@
+        @*<td class="tspace"> </td>*@
+
+        @*<td> </td>
+        <td class="tspace"> </td>*@
+        @*================================================*@
+        <td>@Html.CustomLabelFor(d => d.MColor)</td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.CustomLabelFor(d => d.MAttribute)
+
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.CustomLabelFor(d => d.AltId)</td>
+        <td class="tspace"> </td>
+
+        <td> @Html.CustomLabelFor(d => d.Rev)</td>
+        <td class="tspace"> </td>
+        <td class=""> </td>
+        <td class=""> </td>
+        @*================================================*@
+
+       
+        
+    </tr>
+
+    <tr>
+        <td>
+
+            @{
+    var listDueDates = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.DC,
+                                    Value =LOVConstants.WOMDueDates.DC
+                                } ,
+                                  new SelectListItem() {
+                                    Text = LOVConstants.WOMDueDates.Start,
+                                    Value =LOVConstants.WOMDueDates.Start
+                                }
+
+                            };
+            }
+            @(Html.Kendo().DropDownListFor(model => model.DueDateStr)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                    .BindTo(listDueDates)
+            .HtmlAttributes(new { @class = "widthm" })
+            .Value(LOVConstants.WOMDueDates.Start)
+
+            )
+
+
+
+
+        </td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.Kendo().DatePickerFor(d => d.MDueDate).HtmlAttributes(new { placeholder = "MM/DD/YYYY" }) @*.HtmlAttributes(new { @class = "clsupper widths" })*@
+        </td>
+        <td colspan="2">
+            @{
+    var listMachine = new List<SelectListItem>(){
+                              new SelectListItem()
+                                {
+                                    Text ="N1",
+                                    Value ="N1"
+                                } ,
+                                    new SelectListItem()
+                                {
+                                    Text ="N2",
+                                    Value ="N2"
+                                } ,
+                                    new SelectListItem()
+                                {
+                                    Text ="N3",
+                                    Value ="N3"
+                                } ,
+                                    new SelectListItem()
+                                {
+                                    Text ="N4",
+                                    Value ="N4"
+                                } ,
+                            };
+            }
+            @(Html.Kendo().ComboBoxFor(model => model.MachineMC)
+            .DataTextField("Text")
+.HtmlAttributes(new { @class = "clsupper widths" })
+            .DataValueField("Value")
+            .BindTo(listMachine)
+            .HtmlAttributes(new { @class = "widthms" })
+
+
+            )
+        </td>
+        <td class="tspace"> </td>
+
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.MColor).HtmlAttributes(new { @class = "clsupper widths" })
+        </td>
+        <td class="tspace"> </td>
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.MAttribute).HtmlAttributes(new { @class = "clsupper widths" })
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.AltId).HtmlAttributes(new { @class = "clsupper widths" })</td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Rev).HtmlAttributes(new { @class = "IntField widths" })</td>
+        <td class="tspace"> </td>
+        <td class=""> </td><td class=""> </td>
+        @*================================================*@
+        
+       
+        @*<td>@Html.Kendo().TextBoxFor(d => d.Limit).HtmlAttributes(new { @class = "IntField widths" }).Enable(false)</td>
+        <td class="tspace"> </td>
+        <td colspan="3">@Html.CustomCheckBoxFor(d=> d.FitToMachine,false)</td>
+        <td class="tspace"> </td>*@
+
+    </tr>
+    <tr class="blankrow1"></tr>
+    <tr>
+        <td colspan="6">
+            @Html.RadioButtonFor(r => r.CreateBd, "DozensOnlyOff") Off
+            @Html.RadioButtonFor(r => r.CreateBd, "CreateBd") Create B/D
+            @Html.RadioButtonFor(r => r.CreateBd, "DozensOnly") DZ Only
+           
+        </td>
+        <td colspan="6">@Html.CheckBoxFor(d => d.BOMUpdate) @Html.CustomLabelFor(d => d.BOMUpdate)</td>
+        <td colspan="9">
+
+           
+            <div class="btnContainer floatLeft">
+                @{bool? resUpdate = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WO_UPDATE_SAVE);}
+                @if ((resUpdate.HasValue && resUpdate.Value))
+                {
+                    <input type="submit" value="Mass Change" id="btnWOMMassChange" />
+                }
+            </div>
+
+            <div class="btnContainer floatLeft">
+
+                <input type="reset" value="Clear" id="btnWOMMassClear" />
+            </div>
+        </td>
+       
+
+    </tr>
+    <tr class="blankrow1"></tr>
+</table>
+}

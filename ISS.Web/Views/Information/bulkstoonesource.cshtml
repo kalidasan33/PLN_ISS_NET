@@ -1,0 +1,385 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Information.BulkstoOneSource
+@{
+    ViewBag.Title = "Bulks to OneSource";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docBulkstoOneSourceReady();
+    });
+</script>
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmBulkstoOneSource" }))
+{
+    <input id="hdExtractType" name="hdExtractType" type="hidden" value="" />
+    <div class="expand planForm1  form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Daily Summary (pull job completes daily by 9:30 am EST)")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr>
+                            
+                            <td>
+                                @Html.LabelFor(m => m.FromDate)
+                            </td>
+                            <td>
+                                @Html.LabelFor(m => m.ToDate)
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            
+                            <td>
+                                @Html.Kendo().DatePickerFor(d => d.FromDate)
+                            </td>
+                            <td>
+                                @Html.Kendo().DatePickerFor(d => d.ToDate)
+                            </td>
+                            <td class="dspace2"> </td>
+                            <td><label>Bulks Pulled: </label> <a href="javascript:void(0);" onclick="javascript: information.loadBulksPulledGrid();" id="lblBPull"></a> </td>
+                            <td class="dspace2"> </td>
+                            <td><label>Bulks Successful: </label> <a href="javascript:void(0);" onclick="javascript: information.loadBulksSuccessfulGrid();" id="lblBSuccess"></a> </td>
+                            <td class="dspace2"> </td>
+                            <td><label>All Bulks in Error: </label> <a href="javascript:void(0);" onclick="javascript: information.loadAllBulksinErrorGrid();" id="lblBError"></a></td>
+                            <td class="dspace2"> </td>
+                            <td><label>Error Report: </label> <a href="javascript:void(0);" onclick="javascript: information.loadAllBulksinErrorSecondGrid();" id="lblBErrorSec"></a></td>
+                            <td class="dspace2"> </td>
+                            <td><input type="button" value="Search" id="btnBulktoOnesourceSearch" /></td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>
+                               
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td colspan="4">
+                                <label id="lblReqDateError" style="color:red;"></label>
+                            </td>
+
+                            
+                        </tr>
+                        <tr class="blankrow1"></tr>
+
+
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                    <label id="FilteredColumns" class="display-filters"></label>
+                    @*<div class="btnContainer floatRight">
+                        <input type="submit" id="btnBulkToOSExport" class="excel_btn" />
+                    </div>
+                    <br /><br />*@
+                    @(Html.Kendo().Grid<BulkstoOneSource>().Name("grdBulksPulled").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.BulkNumber).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.LineNumber).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.CurrDueDate).Width(LOVConstants.Width.Small3).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.CreateDate).Width(LOVConstants.Width.Small3).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ContactPlannerCd).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SrcContactCd).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.DemandLoc).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+
+                    columns.Bound(p => p.CorpBusinessUnit).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.MfgPathId).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.MfgRevisionNo).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.CurrOrderQty).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.PlantCd).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.ProcessedToOs).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.OrgnCreateDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+
+                }
+                )
+                        .ToolBar(toolbar =>
+                                  {
+                                      toolbar.Excel();
+                                  })
+                        .Excel(excel => excel
+                                       .FileName("BulksPulled" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                       .Filterable(true)
+                                       .AllPages(true)
+                               )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                .Extra(false)
+                                .Operators(operators => operators
+                                    .ForString(str => FilterHelper.FilterString(str))
+                                    .ForNumber(num => FilterHelper.FilterNumber(num))
+                                             .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                )
+                                )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("bulkstoOneSource", "Information");
+                        read.Data("information.DataBulkstoOneSource");
+                    })
+
+
+
+                )
+                    )
+
+                    @(Html.Kendo().Grid<BulkstoOneSource>().Name("grdBulksSuccessful").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.BulkNumber).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.LineNumber).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.RequisitionId).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ReqsnCreateDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ApproveDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ReqsnStatus).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CurrOrderQty).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ParentStyle).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.CompStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompColor).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompAttribute).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompSize).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CorpBusinessUnit).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalStyle).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ExternalAttribute).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ExternalSize).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalVersion).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalLogo).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Graphic).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Placement).Width(LOVConstants.Width.Small3);
+
+                }
+                )
+                        .ToolBar(toolbar =>
+                                          {
+                                              toolbar.Excel();
+                                          })
+                                .Excel(excel => excel
+                                                .FileName("BulksSuccessful" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                               .Filterable(true)
+                                               .AllPages(true)
+                                       )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                .Extra(false)
+                                .Operators(operators => operators
+                                    .ForString(str => FilterHelper.FilterString(str))
+                                    .ForNumber(num => FilterHelper.FilterNumber(num))
+                                             .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                )
+                                )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("bulkstoOneSource", "Information");
+                        read.Data("information.DataBulkstoOneSource");
+                    })
+
+
+
+                )
+                    )
+                    @(Html.Kendo().Grid<BulkstoOneSource>().Name("grdBulksinError").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.BulkNumber).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.LineNumber).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.RequisitionId).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ReqsnCreateDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ApproveDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ReqsnStatus).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CurrOrderQty).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ParentStyle).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.CompStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompColor).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompAttribute).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CompSize).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CorpBusinessUnit).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalStyle).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ExternalAttribute).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ExternalSize).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalVersion).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ExternalLogo).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Graphic).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Placement).Width(LOVConstants.Width.Small3);
+
+                }
+                )
+                        .ToolBar(toolbar =>
+                                          {
+                                              toolbar.Excel();
+                                          })
+                                .Excel(excel => excel
+                                               .FileName("BulksinError" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                               .Filterable(true)
+                                               .AllPages(true)
+                                       )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                .Extra(false)
+                                .Operators(operators => operators
+                                    .ForString(str => FilterHelper.FilterString(str))
+                                    .ForNumber(num => FilterHelper.FilterNumber(num))
+                                             .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                )
+                                )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("bulkstoOneSource", "Information");
+                        read.Data("information.DataBulkstoOneSource");
+                    })
+
+
+
+                )
+                    )
+                          @(Html.Kendo().Grid<BulkstoOneSource>().Name("grdBulksinErrorSecond").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.BulkNumber).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.LineNumber).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.CurrDueDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.CreateDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.ContactPlannerCd).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SrcContactCd).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.DemandLoc).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.CorpBusinessUnit).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.MfgPathId).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.MfgRevisionNo).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.CurrOrderQty).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.PlantCd).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ProcessedToOs).Width(LOVConstants.Width.Small1);
+                    columns.Bound(p => p.ErrMessage).Width(LOVConstants.Width.Medium2);
+                }
+                )
+                        .ToolBar(toolbar =>
+                                                  {
+                                                      toolbar.Excel();
+                                                  })
+                                        .Excel(excel => excel
+                                                       .FileName("BulksinError_ContactPlanner" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                       .Filterable(true)
+                                                       .AllPages(true)
+                                               )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                .Extra(false)
+                                .Operators(operators => operators
+                                    .ForString(str => FilterHelper.FilterString(str))
+                                    .ForNumber(num => FilterHelper.FilterNumber(num))
+                                             .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                )
+                                )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("bulkstoOneSource", "Information");
+                        read.Data("information.DataBulkstoOneSource");
+                    })
+
+
+
+                )
+                          )
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>
+
+

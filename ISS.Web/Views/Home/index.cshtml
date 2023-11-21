@@ -1,0 +1,34 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.Requisition
+
+@{
+    ViewBag.Title = "Welcome to HBI AVYX Planning Workbench";
+}
+
+@*@section scripts{
+    @Scripts.Render("~/bundles/sourceorder")
+}*@
+<script type="text/javascript">
+    ISS.common.Settings.NeedMenuSliding = false;
+    $(document).ready(function () {
+        ISS.common.Settings.NeedMenuSliding = false;
+    });
+</script>
+  
+
+
+
+
+<div class="expand planForm1  form1 width100" id="contentDiv">
+    <div style="text-align: center; margin-top: 201px;">
+        @Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))  
+        
+       
+        <p style=" font-size: 17px;" class="contentTitle">Please begin by selecting a screen from the left navigation pane</p> 
+    </div>
+  </div>

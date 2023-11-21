@@ -1,0 +1,439 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.Requisition
+
+@using (Html.BeginForm("CreateRequisitions", "Order", FormMethod.Post, new { Id = "frmRequisitions" }))
+{
+    <table class="ttab">
+        <tr class="blankrow1"></tr>
+        <tr>
+        <tr>
+            <td class="tdlbl1">
+                @Html.CustomLabelFor(d => d.RequisitionId)
+                @Html.Hidden("FormMode", "")
+                @Html.Hidden("VendorId", 0)
+                @Html.Hidden("LwCompany", 0)
+                @Html.Hidden("LwVendorLoc")
+                @Html.Hidden("MFGPathId")
+                @Html.Hidden("VendorSuffix", 0)
+                @Html.HiddenFor(m => m.RequisitionComment.PlannerComment)
+                @Html.HiddenFor(m => m.RequisitionComment.ApproverComment)
+
+
+                <a href="javascript:void(0);" onclick="javascript:requisitions.GetNewRequisition();" title="Create New Requisition Id" style="text-decoration: none; font-size: x-large; font-weight: bolder;">+</a>
+            </td>
+            @*<td style="padding: 0px !important;"></td>
+            *@
+            <td style="padding: 0px !important;">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            @Html.Kendo().TextBoxFor(d => d.RequisitionId).HtmlAttributes(new { @class = "widthm1 clsupper" })
+                        </td>
+
+                        <td style="padding: 0px !important;">
+                            @(Html.Kendo().Button()
+                                            .Name("ReqSearchButton")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Req. Search</span>")
+                                            .Events(ev => ev.Click("requisitions.requisitionSearchClick"))
+                            )
+
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.BusinessUnit)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.BusinessUnit)       
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetBusinessContact", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    }).Events(ev => ev.Change("requisitions.BUChange"))
+                                                                            .DataTextField("BusinessUnit")
+                                                                            .DataValueField("BusinessUnit")
+      
+                )
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Season)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.Season)
+          .Filter(FilterType.StartsWith)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Read(r =>
+                                                            r.Data("requisitions.seasonData")
+                                                            );
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetSeason", "Shared");
+
+                                                                })
+
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                               .DataTextField("SeasonName")
+                                                            .DataValueField("SeasonCode")
+                                       .OptionLabel("--Select--")
+                )
+
+
+            </td>
+            <td class="dspace"></td>
+        </tr>
+
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.PlanningContact)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.PlanningContact)
+                                                    .Filter(FilterType.StartsWith)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetPlanningContact", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                            .DataTextField("PlannerContact")
+                                                    .DataValueField("PlannerCode")
+                                            .OptionLabel("--Select--")
+
+                )
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">
+                @Html.CustomLabelFor(d => d.VendorNo)
+            </td>
+            <td style="padding: 0px !important;">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>@Html.Kendo().TextBoxFor(d => d.VendorNo).HtmlAttributes(new { @class = "widthm1", })</td>
+                        <td style="padding: 0px !important;">
+                            @(Html.Kendo().Button()
+                                            .Name("vendorButton")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Vendor</span>")
+                                            .Events(ev => ev.Click("requisitions.vendorSearchClick")))
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.VendorDesc)</td>
+            <td>
+                @Html.LabelFor(d => d.VendorDesc, new { @class = "lblVenSeach" })
+            </td>
+            <td class="dspace"></td>
+
+
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.SourcingContact)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.SourcingContact)
+          .Filter(FilterType.StartsWith)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetSourceContact", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                                            .DataTextField("SourceContactName")
+                                                                            .DataValueField("SourceContactCd")
+                                                                    .OptionLabel("--Select--")
+
+                )
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.DcLoc)</td>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.DcLoc).HtmlAttributes(new { @class = "clsupper", style = "width: 160px;" })
+                @Html.ValidationMessageFor(d => d.DcLoc)
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1" style="width: 130px;">
+                @Html.CustomLabelFor(d => d.PlannedDcDate, "datefor")
+        </td>
+            <td>@Html.Kendo().DatePickerFor(d => d.PlannedDcDate).HtmlAttributes(new { placeholder = "MM/DD/YYYY" })</td>
+            <td class="dspace"></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.RequisitionApprover)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.RequisitionApprover)
+
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetApprover", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                      .DataTextField("PlannerName")
+                                                      .DataValueField("PlannerCd")
+
+
+                )
+            </td>
+
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.ProType)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.ProType).Filter(FilterType.StartsWith)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetProgramType", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                                    .DataTextField("ProgramName")
+                                                                    .DataValueField("ProgramCd")
+                                                  .OptionLabel("--Select--")
+                )
+            </td>
+            <td class="dspace"></td>
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Mode)</td>
+            <td>
+                @(Html.Kendo().DropDownListFor(d => d.Mode).Filter(FilterType.StartsWith)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetMode", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                     .DataTextField("ModeName")
+                                                     .DataValueField("ModeCd")
+                                                     .Value("NS")
+
+
+
+                )
+            </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+
+
+            <td>@Html.CustomLabelFor(d => d.ProdStatus)</td>
+            <td class="tdlbl1">
+                <table>
+                    <tr>
+                        <td>@Html.Kendo().TextBoxFor(d => d.ProdStatus).HtmlAttributes(new { @readonly = "readonly", @class = "widtht" })</td>
+                        <td></td>
+                        <td>@Html.CustomLabelFor(d => d.ReqStatus)</td>
+                        <td>@Html.Kendo().TextBoxFor(d => d.ReqStatus).HtmlAttributes(new { @class = "widtht", @readonly = "readonly" })</td>
+                    </tr>
+                </table>
+
+
+            </td>
+            <td class="dspace"></td>
+            <td class="tdlbl1" style="padding: 0px !important;">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>@Html.CustomLabelFor(d => d.OverPercentage)</td>
+                        <td>@Html.Kendo().TextBoxFor(d => d.OverPercentage).HtmlAttributes(new { @class = "widths" })</td>
+                    </tr>
+                </table>
+
+            </td>
+            <td>
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>@Html.CustomLabelFor(d => d.UnderPercentage)</td>
+                        <td>@Html.Kendo().TextBoxFor(d => d.UnderPercentage).HtmlAttributes(new { @class = "widths" })</td>
+                    </tr>
+                </table>
+
+
+            </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr class="blankrow1"></tr>
+
+
+
+        <tr>
+            <td class="tdlbl1"></td>
+            <td>
+                @Html.CheckBoxFor(d => d.ReqDetailTracking)
+                @Html.LabelFor(d => d.ReqDetailTracking)
+
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.CreatedOn)</td>
+            <td>@Html.Kendo().TextBoxFor(d => d.CreatedOn).HtmlAttributes(new { @readonly = "readonly" })</td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.CreatedBy)</td>
+            <td>@Html.Kendo().TextBoxFor(d => d.CreatedBy).HtmlAttributes(new { @readonly = "readonly" })</td>
+            <td class="dspace"></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td class="tdlbl1"></td>
+
+            <td>
+                @Html.CheckBoxFor(d => d.ShowSummaryOnly)
+                @Html.LabelFor(d => d.ShowSummaryOnly)
+            </td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.UpdatedOn)</td>
+            <td>@Html.Kendo().TextBoxFor(d => d.UpdatedOn).HtmlAttributes(new { @readonly = "readonly" })</td>
+            <td class="dspace"></td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.UpdatedBy)</td>
+            <td>@Html.Kendo().TextBoxFor(d => d.UpdatedBy).HtmlAttributes(new { @readonly = "readonly" })</td>
+            <td class="dspace"></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+    </table>
+}
+<table>
+    <tr>
+        <td class="dspace"></td>
+        <td class="buttonalign">
+            @using (@Html.BeginForm("ExportRequisitionDetails", "Order", FormMethod.Post, new { Id = "frmexpndview" }))
+            {
+                <div class="btnContainer floatRight">
+                    <input type="submit" value="Expand View" id="btnReqExpandView" />
+
+                </div>
+            }
+        </td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+
+
+        <td colspan="5"></td>
+        <td>
+            @using (@Html.BeginForm("ExportRequisitionDetails", "Order", FormMethod.Post, new { Id = "frmaddccomments" }))
+            {
+                bool? resultComments = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_ADD_COMMENT);
+                if((resultComments.HasValue && resultComments.Value) || (resultComments.HasValue && resultComments.Value))
+                {
+                    <div class="btnContainer floatRight">
+                        <input type="submit" value="Add Comment" id="btnReqComments" />
+                    </div>
+                }
+            }
+        </td>
+        <td class="dspace"></td>
+        <td>
+            @using (@Html.BeginForm("ExportRequisitionDetails", "Order", FormMethod.Post, new { Id = "frmExportRequisition" }))
+            {
+                <div class="btnContainer floatRight">
+                    <input type="hidden" id="reqId" name="requisitionId" />
+                    @*<input type="submit" id="btnExportRequisitionDetails" class="excel_btn" tooltip="Export" />*@
+                    <button class="k-button k-button-icontext k-grid-excel" id="btnExportRequisitionDetails" tooltip="Export" type="submit"><span class="k-icon k-i-excel"></span>Export to Excel</button>
+
+                </div>
+            }
+        </td>
+    </tr>
+    <tr class="blankrow1"></tr>
+</table>
+
+
+
+<br />
+
+
+
+

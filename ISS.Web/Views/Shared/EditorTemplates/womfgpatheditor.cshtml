@@ -1,0 +1,18 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetMFGId", "Order").Type(HttpVerbs.Post).Data("WO.retrieMFGData");
+      }).ServerFiltering(false);
+  })
+          .DataValueField("MfgPathId")
+                      .DataTextField("SewPltMfg")
+                      //.AutoBind(true)
+                         // .OptionLabel("--Select--")
+              .Events(e =>
+              {
+                  e.Change("WO.onMFGChanged");
+              })
+)
+

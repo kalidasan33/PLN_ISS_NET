@@ -1,0 +1,8 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+
+@model decimal
+<input type="text" id="Qty" name="Qty"  class="k-textbox" required  onblur="onQtyCodeChanged(this);" onkeypress="isNumber(this);"  />
+@*@(Html.Kendo().NumericTextBox().HtmlAttributes(new { ondblclick = "onQtyCodeClick(this);", onblur = "onQtyCodeChanged(this);" })   
+   )*@
+

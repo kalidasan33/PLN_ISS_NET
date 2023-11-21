@@ -1,0 +1,18 @@
+﻿@*@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("PopulateCutPath", "Order").Type(HttpVerbs.Post).Data("WO.CutPathFilterData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("CutPath")
+  .DataTextField("CutPath")
+        //.Events(e =>
+        //{
+        //    e.Select("WOM.SizeSelect");
+        //})
+)*@
+
+@model string
+<input type="text" id="CutPath" name="CutPath" class="k-textbox" ondblclick="WO.PopulateCutPathPopUp(this);" onchange="WO.UpdateCumOnChange(this);" style="text-transform:uppercase" />

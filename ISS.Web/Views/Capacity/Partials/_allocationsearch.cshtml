@@ -1,0 +1,67 @@
+﻿@using ISS.Core.Model.Capacity;
+@model AllocationPopup
+<title> Allocation Details </title>
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmAllocationDetails" }))
+{
+    @*<div class="btnContainer floatRight">
+        <input type="submit" id="btnAllocationPopupExport" class="excel_btn" />
+    </div>
+    <br /><br /><br />*@
+    <input type="hidden" id="Capacity" name="CapacityGroup" />
+    <input type="hidden" id="hdnPlant" name="Plant" />
+    <input type="hidden" id="WC" name="WorkCenter" />
+    <input type="hidden" id="hdnCapType" name="CapacityType" />
+    <input type="hidden" id="hdnStatus" name="ProductionStatus" />
+    <input type="hidden" id="hdnSpill" name="SpillOver" />
+    <input type="hidden" id="hdnDate" name="PlanEndDate" />
+
+    @(Html.Kendo().Grid<AllocationPopup>().Name("grdAllocationDetail").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                        columns =>
+                        {
+                            columns.Bound(s => s.CapacityGroup).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.Plant).Width(ISS.Common.LOVConstants.Width.Style);
+                            columns.Bound(s => s.WorkCenter).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.StyleCD).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.ColorCD).Width(ISS.Common.LOVConstants.Width.Color); 
+                            columns.Bound(s => s.AttributeCD).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.SizeCD).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.ProdOrderNo).Width(ISS.Common.LOVConstants.Width.Medium1);
+                            columns.Bound(s => s.WOQty).Width(ISS.Common.LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" });
+                            columns.Bound(s => s.SAH).Width(ISS.Common.LOVConstants.Width.Small3).HtmlAttributes(new { @class = "ob-right" });
+                            columns.Bound(s => s.FormattedDueDate).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.Priority).Width(ISS.Common.LOVConstants.Width.Small3).HtmlAttributes(new { @class = "ob-right" });
+                        }
+                        )
+                              .ToolBar(toolbar =>
+                                                    {
+                                                        toolbar.Excel();
+                                                    })
+                                                    .Excel(excel => excel
+                                                        .FileName("AllocationDetails" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                        .Filterable(true)
+                                                        .AllPages(true)
+                                                     )                      
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                        .Sortable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("GetAllocationDetails", "Capacity");
+                                read.Data("Capacity.searchAllocationPopup");
+                            })                          
+                        )
+
+    )
+}

@@ -1,0 +1,34 @@
+﻿@using ISS.Core.Model.Order;
+
+
+@(Html.Kendo().Grid<DCCode>().Name("grdDCCode").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click((ViewBag.SelectEvent == null) ? "WO.showDCCodeDetails" : ViewBag.SelectEvent)).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+                            columns.Bound(s => s.DCD).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.DCDescription);
+                        }
+                        )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                                .Events(e => e.DataBound("ISS.common.dataBoungGrid"))
+                        .Sortable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("GetDcCodes", "Order", new { area = "" });
+                            })
+                        )
+
+)

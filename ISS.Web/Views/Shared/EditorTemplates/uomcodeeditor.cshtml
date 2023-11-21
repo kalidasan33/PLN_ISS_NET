@@ -1,0 +1,11 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetSkuUom", "Order").Type(HttpVerbs.Post).Data("retrieveUomData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Uom")
+  .DataTextField("UomDesc")
+)

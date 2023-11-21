@@ -1,0 +1,12 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetSkuAttributes", "Order").Type(HttpVerbs.Post).Data("WOM.FilterData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Attribute")
+  .DataTextField("Attribute")
+      .Events(e => e.Change("WOM.AttributeChange"))
+)

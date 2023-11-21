@@ -1,0 +1,153 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.Requisition
+
+@{
+    ViewBag.Title = "Create Requisitions";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/sourceorder" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        requisitions.docRequisitionsReady();
+        requisitions.const.url = '@Url.Action("action","order")'
+        requisitions.const.CreatedBy = '@Model.CreatedBy';
+        requisitions.const.CreatedOn = '@DateTime.Now.ToString(LOVConstants.DateFormatDisplay)'
+
+
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+            <text>
+        setTimeout('requisitions.loadRetOrderGrid()', 1000);
+        location.hash = 'autoLoad'
+        </text>
+
+        }
+
+    });
+</script>
+
+<style>
+    /*.k-dirty{ 
+border-width:0; 
+}
+.x-grid-dirty-cell {
+    background-image: none;
+}
+ .k-dirty-cell{ 
+ background-image: none; 
+}
+.k-dirty-cell{ 
+ border-width:0; 
+}*/
+</style>
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+
+
+    <div class="expand planForm1  form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Requisition Header")
+                .Content(@<div>@Html.Partial("Requisition")</div>).Expanded(true);
+
+
+            panelbar.Add().Text("Requisition Detail")
+                   .Content(@<div id="ReqOrderDetails">@Html.Partial("RequisitionDetail",new ISS.Core.Model.Order.RequisitionDetail())
+                              
+        @*<div id="RequisitionEditor">@Html.Partial("RequisitionDetailEditor", new RequisitionDetail())</div>*@
+                        <table class="ttab"  width="100%">
+                            <tr class="blankrow1"></tr>
+                            <tr class="blankrow1"></tr>
+                            <tr class="blankrow1"></tr>
+                            <tr>
+                                @*).Expanded(true);
+
+          panelbar.Add().Text("Detail")
+        .Content(*@
+
+                                <td>
+                                    <div class="btnContainer floatRight">
+
+                                        <input type="reset" value="Clear" id="btnClearSO" />
+                                    </div>
+
+                                    <div class="btnContainer floatRight">
+                                        @{bool? resDelete = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SOURCED_ORDER);}
+                                        @if(resDelete.HasValue && resDelete.Value)
+                                        {
+                                            <input type="button" value="Delete" id="btnDelReq" />
+                                        }
+                                    </div>
+                                  
+
+                                    <div class="btnContainer floatRight">
+                                    @{bool? resSave = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_ADD_SAVE);}
+                                    @{bool? resUpdate = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_UPDATE_SAVE);}
+                                    @if((resSave.HasValue && resSave.Value)|| (resUpdate.HasValue && resUpdate.Value))
+                                    {
+                                        <input type="button" value="Save" id="btnSOSave" />
+                                    }
+                                    </div>                                  
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr class="blankrow1"></tr>
+                        </table>
+                    
+                        <br />
+                  <br/>
+                </div>).Expanded(true);
+                bool? resSave1 = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_ADD_SAVE);
+                bool? resUpdate1 = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_UPDATE_SAVE);
+                if((resSave1.HasValue && resSave1.Value)|| (resUpdate1.HasValue && resUpdate1.Value))
+                {
+                    panelbar.Add().Text("Search Criteria")
+                  .Content(@<div id="ReqOrderRetieive">@Html.Partial("RetrieveOrders", new RequisitionOrderSearch())</div>).Expanded(true);
+
+                    panelbar.Add().Text("Retrieve Orders")
+                    .Content(@<div id="ReqOrderRetieiveDetail">
+                            <br />
+                            @Html.Partial("RetrieveOrderDetail", new RequisitionOrderSearch())
+                            <br />
+                        </div>).Expanded(true);
+              }
+
+        })
+)
+
+
+
+    </div>
+
+
+<div class="divVendorSearchPopup" style="display:none;">
+
+    @Html.Partial("_VendorSearch",new ISS.Core.Model.Order.VendorSearch())
+</div>
+
+<div class="divRequisitionSearchPopup" style="display:none;">
+
+    @Html.Action("RequisitionSearch")
+</div>
+
+<div class="divRequisitionCommentsPopup" style="display:none;">
+
+    @Html.Partial("RequisitionComments")
+</div>
+
+<div class="divRequisitionExpandPopup" style="display:none;">
+    @Html.Partial("_RequisitionExpandView")
+</div>
+
+

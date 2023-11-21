@@ -1,0 +1,212 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Information.StyleSearch
+@{
+    ViewBag.Title = "Style Exceptions";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docStyleExceptionsReady();
+    });
+</script>
+ 
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmStyleExceptions" }))
+{
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.LabelFor(d => d.StyleCode)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.ColorCode)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.AttributeCode)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.SizeShortDesc)</td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.StyleCode)
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.ColorCode)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.AttributeCode)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.SizeShortDesc)</td>
+                            <td class="dspace"> </td>
+
+                        </tr>
+                        <tr class="blankrow1"></tr>
+
+                        <tr>
+                            <td> @Html.LabelFor(d => d.PrimaryDC)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.LOB)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.Planner)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.WorkCenter)</td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.PrimaryDC)
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.LOB)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Planner)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.WorkCenter)</td>
+                            <td class="dspace"> </td>
+
+                        </tr>
+                        <tr class="blankrow1" ></tr>
+                        <tr>
+                            <td> @Html.CustomCheckBoxFor(d => d.APS)  </td>
+                            @*<td> @Html.CheckBoxFor(d => d.APS, new { @class="cb"}) @Html.LabelFor(d => d.APS)</td>*@
+                            <td class="dspace"> </td>
+                            <td> @Html.CustomCheckBoxFor(d => d.AVYX)  </td>
+                            <td class="dspace"> </td>
+                            <td> @Html.CustomCheckBoxFor(d => d.ISS)  </td>
+                            <td class="dspace"> </td>
+                            <td> @Html.CustomCheckBoxFor(d => d.NET )  </td>
+                            <td class="dspace"> </td>
+
+                        </tr>
+                        <tr>
+                            <td> @Html.CustomCheckBoxFor(d => d.CWC)  </td>
+                            <td class="dspace"> </td>
+                            <td> @Html.CustomCheckBoxFor(d => d.MTLA)  </td>
+                            <td class="dspace"> </td>
+                        </tr>
+
+
+                        <tr class="blankrow1"></tr>
+
+                        <tr>
+                            <td colspan="7">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="btnStyleExceptionsSearch" />
+                                    <input type="reset" value="Clear" id="btnStyleExceptionsClear" />
+                                   
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        <tr class="blankrow1"></tr>
+                       
+
+
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                          <label id="FilteredColumns" class="display-filters"></label>
+                          @*<div class="btnContainer floatRight">
+                              <input type="submit" id="btnStyleExceptionsExport" class="excel_btn" />
+
+                          </div>
+                          
+    <br /><br />*@
+
+                    @(Html.Kendo().Grid<StyleException>().Name("grdStyleExceptions").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.PrimaryDC).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.LOB).Width(LOVConstants.Width.Large1);
+                    columns.Bound(p => p.Planner).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.WorkCenter).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.DemandStr).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.MFGPath).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ProductFamily).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.Reason).Width(350).HtmlAttributes(new { style = "color:red;" });
+
+                }
+                )
+
+                .AutoBind(false)
+                         .ToolBar(toolbar =>
+                                                                                {
+                                                                                    toolbar.Excel();
+                                                                                })
+                                                                                .Excel(excel => excel
+                                                                                   .FileName("StyleExceptions" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                                                    .Filterable(true)
+                                                                                    .AllPages(true)
+                                                                                 )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                            .ForDate(dte=>FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                .Sortable().Events(ev=> ev.DataBound("information.gridDataBoundStyle"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("StyleException", "Information");
+                        read.Data("information.searchStyleExceptions");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>

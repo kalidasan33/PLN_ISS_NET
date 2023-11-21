@@ -1,0 +1,142 @@
+﻿@using ISS.Common
+
+@using ISS.Core.Model.Order;
+
+
+@model  List<RequisitionExpandView>
+@if (Model != null)
+    {
+<label id="modsummary">
+    **Grand Total DZ :
+   @Model.Sum(r => r.Eaches).ConvertEachesToDz().ToString("N2")
+    (@Model.Sum(r => r.Eaches) eaches )
+    Number of Cases @Model.Sum(r => r.Cases)
+</label>
+    <br/>
+    <br/>
+  @Html.Hidden("NeedSummary", (bool)ViewBag.NeedSummary)
+
+    }
+<table border="1" cellpadding="2" cellspacing="2" id="tblExpandView" style="width:100%;" class="ttab">
+    <thead>
+    <th></th>
+    <th>Style</th>
+    <th>Color</th>
+    <th>Attribute</th>
+    <th>Size</th>
+    <th>Rev</th>
+    <th>UM</th>
+    <th>Qty</th>
+    <th>Eaches</th>
+    <th>Cases</th>
+    </thead>
+    @if (Model != null)
+    {
+        for (int i=0; i<Model.Count; i++)
+        {
+            var item=Model[i];
+            <tr style="font-weight:bold">
+                <td>@item.StyleType  </td>
+                <td>@item.Style</td>
+                <td>@item.Color</td>
+                <td>@item.Attribute  </td>
+                <td>@item.SizeShortDesc </td>
+                <td>@item.Revision </td>
+                <td>@item.UOM  </td>
+                <td>@item.QtyStd  </td>
+                <td>@item.Eaches.RoundCustom(0)  </td>
+                <td> @item.Cases </td>
+
+            </tr>
+            /*<tr class="blankrow1"></tr>*/
+            <tr><td colspan="10"> @item.StyleFormat</td></tr>
+            /*<tr class="blankrow1"></tr>*/
+            if (item.BomComponents != null)
+            {
+                var IsMfgStart = false;
+                //var BomQty = @item.BomComponents.Where(r => (r.StyleType == LOVConstants.BOMStyle.PKG)).Sum(r => r.Usage);
+                foreach (var bom in item.BomComponents)
+                {
+                    
+                    if (@bom.StyleType == LOVConstants.BOMStyle.PKG)
+                    {
+                        <tr class="blankrow1"></tr>
+                    }
+                    if (IsMfgStart)
+                    {
+                        <tr style="background-color:lightyellow">
+                            <td>@bom.StyleType  </td>
+                            <td>@bom.Style</td>
+                            <td colspan="8">@bom.StyleDesc</td>
+                        </tr>
+                        @rowdet(@bom, true, @bom.Usage * @item.BomComponents.Where(r => (r.StyleType == LOVConstants.BOMStyle.PKG)).Sum(r => r.Usage))
+
+                    }
+                    else
+                    {
+                        @rowdet(@bom, IsMfgStart, @bom.Usage * @item.BomComponents.Where(r => (r.StyleType == LOVConstants.BOMStyle.PKG)).Sum(r => r.Usage))
+                    }
+                    if (@bom.StyleType == LOVConstants.BOMStyle.PKG)
+                    {
+                        IsMfgStart = true;
+                    }
+                    else
+                    {
+                        IsMfgStart = false;
+                    }
+                }
+
+            }
+            <tr class="blankrow1"></tr>
+            if (i== Model.Count-1 ||  Model[i + 1].Style != item.Style)
+            {
+                <tr style="font-weight:bold"><td colspan="10">**Style @item.Style Total DZ :
+                     @Model.Where(r => r.Style == item.Style).Sum(r => r.Eaches).ConvertEachesToDz().ToString("N2")
+                    (@Model.Where(r => r.Style == item.Style).Sum(r => r.Eaches).RoundCustom(0) eaches )
+                     Number of Cases @Model.Where(r => r.Style == item.Style).Sum(r => r.Cases) </td></tr>
+            }
+
+        }
+    }
+</table>
+
+
+@helper rowdet(RequisitionBOM bom, bool IsMfgStart, decimal qty)
+{
+    <tr style="background-color:lightyellow">
+        @if (!IsMfgStart  && (@bom.StyleType == LOVConstants.BOMStyle.PKG))
+        {
+            <td>@bom.StyleType  </td>
+            <td>@bom.Style</td>
+            <td>@bom.Color</td>
+        }
+        else
+        {
+            <td>   </td>
+            <td> </td>
+            <td>@bom.Color  (@bom.ColorDesc)</td>
+        }
+        
+        <td>@bom.Attribute  </td>
+        <td>@bom.SizeAbb </td>
+        <td>@bom.Revision </td>
+        <td>   </td>
+        @if (!IsMfgStart && (@bom.StyleType == LOVConstants.BOMStyle.PKG))
+        {
+            <td> @qty.ToString("N2")  </td>
+        }
+        else
+        {
+            
+            <td> </td>
+        }
+        <td colspan="2">@bom.DisplayCases </td>
+    </tr>
+}
+
+<style>
+    .ttab tr td {
+        padding:2px;
+    }
+
+</style>

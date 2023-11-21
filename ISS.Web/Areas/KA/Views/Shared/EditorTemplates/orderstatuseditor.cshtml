@@ -1,0 +1,16 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetOrderStatus", "../Order").Type(HttpVerbs.Post);
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Text")
+  .DataTextField("Text")
+  .Events(e => e.Change("WOM.OrderChange"))
+)
+

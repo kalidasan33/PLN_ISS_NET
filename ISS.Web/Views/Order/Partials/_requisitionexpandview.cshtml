@@ -1,0 +1,196 @@
+﻿@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model Requisition
+
+@using (Html.BeginForm("ReqExpandViewExport", "Order", FormMethod.Post, new { Id = "frmReqExpandView" }))
+{
+    <div class="btnContainer floatRight">
+        <input type="submit" id="exportButton" class="excel_btn" data-url="@Url.Action("ReqExpandViewExport", "order")" tooltip="Export" />
+
+    </div>
+    <table class="ttab">
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionId, new { @class = "bold-message" })</td>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            @Html.Kendo().TextBoxFor(d => d.RequisitionId).HtmlAttributes(new { @class = "widthm1" })
+                            @Html.Hidden("ExReqVersionNo")
+                            @Html.Hidden("ExVendorNo")
+                            @Html.Hidden("ExVendorLocNo")
+                            @Html.Hidden("ExVendorId")
+                            @Html.Hidden("ExVendorSuffixNo")
+                            @Html.Hidden("ExLwCompanyNo")
+                        </td>
+                        <td>
+                            @(Html.Kendo().Button()
+                                .Name("btnReqExpandSearch")
+                                .Tag("em")
+                                .SpriteCssClass("k-icon k-i-refresh")
+                                .Content("<span class='k-sprite'>Req. Search</span>")
+                                .Events(ev => ev.Click("requisitions.searchReqExpandView"))
+                            )
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.BusinessUnit, new { @class = "bold-message" })</td>
+            <td colspan="4">
+
+                <label id="lblBusinessUnit" for="BusinessUnit" class="reqExpandClear"></label>
+            </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.CreatedOn, new { @class = "bold-message" })</td>
+            <td><label id="lblCreatedOn" for="CreatedOn" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.ReqStatus, new { @class = "bold-message" })</td>
+            <td><label id="lblReqStatus" for="ReqStatus" class="reqExpandClear"></label></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> <span class="bold-message">Last Update</span></td>
+            <td><label id="lblUpdatedOn" for="UpdatedOn" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> <span class="bold-message">Updated By</span></td>
+            <td><label id="lblUpdatedBy" for="UpdatedBy" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.PlanningContact, new { @class = "bold-message" })</td>
+            <td><label id="lblPlanningContact" for="PlanningContact" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.DcLoc, new { @class = "bold-message" })</td>
+            <td><label id="lblDcLoc" for="DcLoc" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.SourcingContact, new { @class = "bold-message" })</td>
+            <td><label id="lblSourcingContact" for="SourcingContact" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.Season, new { @class = "bold-message" })</td>
+            <td><label id="lblSeason" for="Season" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionApprover, new { @class = "bold-message" })</td>
+            <td><label id="lblRequisitionApprover" for="RequisitionApprover" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.ProType, new { @class = "bold-message" })</td>
+            <td><label id="lblProType" for="ProType" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.ApprovalSubmitted, new { @class = "bold-message" })</td>
+            <td><label id="lblApprovalSubmitted" for="ApprovalSubmitted" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.Approved, new { @class = "bold-message" })</td>
+            <td><label id="lblApproved" for="Approved" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> <span class="bold-message">Vendor</span></td>
+            <td><label id="lblVendorName" for="VendorName" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+
+            <td class="tdlbl1"> @Html.LabelFor(d => d.PlannedDcDate, new { @class = "bold-message" })</td>
+            <td><label id="lblPlannedDcDate" for="PlannedDcDate" class="reqExpandClear"></label></td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionComment.PlannerComment, new { @class = "bold-message" })</td>
+            <td><label id="lblPlannerComment" for="RequisitionComment.PlannerComment" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+
+            <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionComment.ApproverComment, new { @class = "bold-message" })</td>
+            <td><label id="lblApproverComment" for="RequisitionComment.ApproverComment" class="reqExpandClear"></label></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.Mode, new { @class = "bold-message" })</td>
+            <td><label id="lblMode" for="Mode" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.OverPercentage, new { @class = "bold-message" })</td>
+            <td><label id="lblOverPercentage" for="OverPercentage" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1"> @Html.LabelFor(d => d.UnderPercentage, new { @class = "bold-message" })</td>
+            <td><label id="lblUnderPercentage" for="UnderPercentage" class="reqExpandClear"></label></td>
+            <td class="dspace"> </td>
+        </tr>
+
+    </table>
+
+    <label id="lblExStyleSummarized" for="tblExpandView" class="reqExpandClear"></label>
+
+    <br />
+    <div id="expandgrid"></div>
+    <br />
+    <div class="btnContainer floatRight">
+        @{bool? reset = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_RESET_TO_CONSTRUCTION);
+        }
+        @if (reset.HasValue && reset.Value)
+        {
+            @(Html.Kendo().Button()
+                .Name("btnResettoConstruction")
+                .Tag("em")
+                .Content("Reset to Under Construction")
+                .Events(ev => ev.Click("requisitions.resetToConstruction"))
+            )
+        }
+        @{bool? release = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_RELEASE_TO_SOURCING);
+        }
+        @if (release.HasValue && release.Value)
+        {
+            @(Html.Kendo().Button()
+                .Name("btnReleasetoSourcing")
+                .Tag("em")
+                .Content("Release to Sourcing")
+                .Events(ev => ev.Click("requisitions.releaseToSourcing"))
+            )
+        }
+        @{bool? comment = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SO_EXPVIEW_ADD_COMMENT);
+        }
+        @if (comment.HasValue && comment.Value)
+        {
+            @(Html.Kendo().Button()
+                .Name("btnExComments")
+                .Tag("em")
+                .Content("Add Comments")
+               .Events(ev => ev.Click("requisitions.ExpandCommentClick"))
+            )
+        }
+        @*<div class="divExpandCommentsPopup" style="display:none;">
+
+                @Html.Partial("RequisitionComments")
+            </div>*@
+    </div>
+
+}
+
+<style>
+    th {
+        height: 25px;
+        font-weight: bold;
+        text-align: left;
+        background-color: #ccc;
+    }
+
+    .bold-message {
+        font-weight: bold;
+    }
+
+    #frmReqExpandView .widthm1 {
+        text-transform: uppercase;
+    }
+</style>

@@ -1,0 +1,85 @@
+﻿@using ISS.Core.Model.Order;
+
+@using (Html.BeginForm("ExportNetDemandDetails", "Order", FormMethod.Post, new { Id = "frmNetDemand" }))
+{
+<div id="netDemandResults">
+
+    
+    @*<div class="btnContainer floatRight">
+        <input type="submit" id="exportnetDmdButton" class="excel_btn" />
+
+    </div>
+    <br /><br />*@
+
+    
+    @(Html.Kendo().Grid<NetDemand>().Name("netDmdGrid").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                columns =>
+                {
+                    columns.Template(t => { }).Title("Sl No").ClientTemplate(
+                           "#= summary.renderRecordNumber(data) #"
+                       ).Width(30);  
+                    columns.Bound(s => s.plant).Width(100);
+                    columns.Bound(s => s.cat).Width(100);
+                    //columns.Bound(s => s.rule_number);//.Width(120);
+                    columns.Bound(s => s.rulenumber);//.Width(100);
+                    columns.Bound(s => s.ruleDescription);//.Width(120);
+                    columns.Bound(s => s.priority_sequence).Width(90).HtmlAttributes(new { @class = "ob-right" })
+                    .ClientFooterTemplate(" TOTAL DEMAND: ");
+                    //.ClientTemplate("#= rule_number + ' - ' + demand_source #");
+                    //columns.Bound(s => s.qty).Width(80).HtmlAttributes(new { @class = "ob-right" }).FooterHtmlAttributes(new { @class = "ob-right" }).Format("{0:n1}")
+                    columns.Bound(s => s.qty).Width(80).HtmlAttributes(new { @class = "ob-right" }).FooterHtmlAttributes(new { @class = "ob-right" }).Format("{0:n1}")
+                    //.ClientTemplate("#= kendo.toString(qty/12, 'n1') #")
+                    .ClientFooterTemplate("#= kendo.toString(summary.calculateNetDmdTotal(), 'n1')#");
+                        //.ClientFooterTemplate(" #= kendo.toString(sum, 'n1') #");
+
+                    columns.Bound(s => s.NET_Demand).Width(80).HtmlAttributes(new { @class = "ob-right" }).Format("{0:n1}");
+                    columns.Bound(s => s.Consumed);//.Width(120);
+
+                }
+                )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                })
+                     .ToolBar(toolbar =>
+                               {
+                                  toolbar.Excel();
+                               })
+                               .Excel(excel => excel
+                               .FileName("NetDemand" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                               .Filterable(true)
+                               //.ProxyURL(Url.Action("ExportGetSummaryDetails", "Order", new { Area = "" }))
+                               .AllPages(true)
+                             )
+                //.Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                //{
+                //    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                //})
+                .Sortable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Aggregates(aggregates =>
+                    {
+                        aggregates.Add(p => p.qty).Sum();
+                    })
+                    .ServerOperation(false)
+                    //.PageSize(10)
+                    .Read(read =>
+                    {
+                        read.Url("../Order/NetDemand"); 
+                        read.Data("summary.searchNetDemand");
+
+                    })
+                    
+                
+                )
+                .Events(e => e.DataBound("summary.dataBoundNetDmd"))
+                 
+
+    )
+
+    
+</div>
+}

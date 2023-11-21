@@ -1,0 +1,39 @@
+﻿using Bootstrapper;
+using ISS.Core.Model.Security;
+using System.Collections.Generic;
+using System.IO;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.Routing;
+using ISS.Web.Helpers;
+
+namespace ISS.Web
+{
+    public class MvcApplication : System.Web.HttpApplication
+    {
+        protected void Application_Start()
+        {
+            AreaRegistration.RegisterAllAreas();
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles, ISSGlobals.Version);
+            UnityBootstrapper.Initialize();
+            MenuConfigHelper.RegisterMenuItems();
+            ViewEngines.Engines.Add(new RazorViewEngine
+            {
+                PartialViewLocationFormats = new[]
+                {
+                    "~/Views/{1}/Partials/{0}.cshtml", "~/Areas/ka/Views/{1}/Partials/{0}.cshtml"
+                }
+            });
+
+            log4net.Config.XmlConfigurator.Configure(new FileInfo(Server.MapPath("~/Web.config")));
+            
+           
+        }
+       
+            
+
+    }
+}

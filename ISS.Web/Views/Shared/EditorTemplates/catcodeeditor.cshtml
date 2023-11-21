@@ -1,0 +1,11 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("WOMGetCatCode", "Order").Type(HttpVerbs.Post);
+      }).ServerFiltering(false);
+  })
+  .DataValueField("CategoryCode")
+  .DataTextField("CategoryCode")
+)

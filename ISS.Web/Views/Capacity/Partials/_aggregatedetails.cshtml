@@ -1,0 +1,73 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Capacity;
+@using ISS.Core.Model.Capacity;
+@model AggregatePopup
+<title> ISS Aggregation Details </title>
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmAggregationDetails" }))
+{
+    @*<div class="btnContainer floatRight">
+            <input type="submit" id="btnAllocationPopupExport" class="excel_btn" />
+        </div>
+        <br /><br /><br />*@
+    <input type="hidden" id="tablename" />
+    <input type="hidden" id="corpdiv" />
+    <input type="hidden" id="childplant" />
+    <input type="hidden" id="parentplant" />
+    <input type="hidden" id="capgroup" />
+    <input type="hidden" id="wc" />
+    <input type="hidden" id="include" />
+    <input type="hidden" id="userid" />
+    <input type="hidden" id="createdt" />
+    <input type="hidden" id="updatedt" />
+    
+    @(Html.Kendo().Grid<AggregatePopup>().Name("grdAggregateDetail").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                        columns =>
+                        {
+                            columns.Bound(s => s.TableName).Width(ISS.Common.LOVConstants.Width.Large3);
+                            columns.Bound(s => s.CorpDivisionGroup).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.ChildPlant).Width(ISS.Common.LOVConstants.Width.Style);
+                            columns.Bound(s => s.ParentPlant).Width(ISS.Common.LOVConstants.Width.Style);
+                            columns.Bound(s => s.CapacityGroup).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.CapacityAlloc).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.IncludeInd).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.UserId).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.UpdateDate).Width(ISS.Common.LOVConstants.Width.Small3);
+                 
+                        }
+                        )
+                              .ToolBar(toolbar =>
+                                                    {
+                                                        toolbar.Excel();
+                                                    })
+                                                    .Excel(excel => excel
+                                                        .FileName("AggregationDetails" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                        .Filterable(true)
+                                                        .AllPages(true)
+                                                     )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                               
+                                conf.Enabled(true);
+                            })
+                        .Sortable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                            .Read(read =>
+                            {
+                                read.Action("GetAggregationDetails", "Capacity");
+                                read.Data("Capacity.searchDataAllocations");
+                            })
+                        )
+
+    )
+}

@@ -1,0 +1,267 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.WOMDetail
+
+<style>
+    
+</style>
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmWOMDetail" }))
+{
+    <input type="hidden" name="gridData" id="gridData" />
+    <input type="hidden" name="gridColumns" id="gridColumns" />
+<table class="ttab" width="100%">
+
+    <tr style="color:blue;">
+        <td class="dspace"> </td>
+        <td class="dspace"> </td>
+        
+        <td><label> Total FQ DZ : </label> <label id="lblFQDZ"></label> </td>
+        <td class="dspace"> </td>
+
+        <td><label> Total TQ Dz : </label> <label id="lblDZ"></label> </td>
+        <td class="dspace"> </td>
+        
+        <td><label> Total Greige Lbs : </label> <label id="lblGreige"></label>  </td>
+        <td class="dspace"> </td>
+
+        <td><label>Total Finish Lbs : </label> <label id="lblFinish"></label> </td>
+        <td class="dspace"> </td>
+    </tr>
+    <tr class="blankrow1"></tr>
+    <tr>
+    <td colspan="4">
+        @Html.RadioButtonFor(r => r.Views, "Default") Default View
+        @Html.RadioButtonFor(r => r.Views, "Cylinder") Cylinder View
+        @Html.RadioButtonFor(r => r.Views, "MSKU") Multi-SKU View
+    </td>
+
+    <td  class="Filters"><a class="linki2" id="filtergrid1" href="javascript:void(0)"> Filter Grid</a> </td>
+    <td colspan="4"><label id="FilteredColumns" class="display-filters"></label></td>
+
+    @*<td colspan="2">
+        <div class="btnContainer floatRight">
+            <input type="submit" id="btnWOMExport" class="excel_btn" />
+            
+        </div>
+    </td>*@
+    <td class="dspace"> </td>
+</tr>
+</table>
+
+@(Html.Kendo().Grid<WOMDetail>()
+    .Name("grdWOM")
+
+    .Columns(columns =>
+    {
+
+        columns.Command(command =>
+        {
+            //command.Custom("EditItem").Text(" ").Click("WOM.editOrderDetail");
+            command.Custom("DeleteItem").Text(" ").Click("WOM.removeOrderDetail");         
+
+        }).Width(60).Locked(true);
+        columns.Bound(s => s.ErrorMessage).Width(50).Locked(true)
+                     .ClientTemplate("<span class='#=(ErrorStatus) ? 'k-icon k-warning':' '#' title=\"#=(ErrorStatus) ? ErrorMessage:' '#\"> </span> ").Filterable(false);
+        columns.Bound(p => p.GroupId).Width(LOVConstants.Width.Small2B).Locked(true);
+        columns.Bound(p => p.OrderId).Width(LOVConstants.Width.Small2B).Locked(true);
+        columns.Bound(p => p.OrderType).Width(LOVConstants.Width.Small2B).Locked(true);
+        columns.Bound(p => p.OrderStatusDesc).EditorTemplateName("OrderStatusEditor").Width(LOVConstants.Width.Medium1).Locked(true);
+        //columns.Bound(p => p.SellingStyle).Width(LOVConstants.Width.Style).Locked(true);
+        //Asif 10/9/2018 To Add Selling Sku popup while clicking in Selling Style in WOM screen
+        columns.Bound(p => p.SellingStyle).Width(LOVConstants.Width.Style).Locked(true).ClientTemplate("<a class='linki2 lnkSellStyle' href='javascript:void(0)' > #=SellingStyle# </a>").EditorTemplateName("SellingStyleEditor").HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.Style).Width(LOVConstants.Width.Style).Locked(true).ClientTemplate("<a class='linki2 lnkStyle' href='javascript:void(0)' > #=Style# </a>").EditorTemplateName("SellingStyleEditor").HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.Color).EditorTemplateName("ColorEditor").Width(LOVConstants.Width.Small2).Locked(true);
+        columns.Bound(p => p.Attribute).EditorTemplateName("AttributeEditor").Width(LOVConstants.Width.Small2).Locked(true);
+        columns.Bound(p => p.SizeShortDes).Width(LOVConstants.Width.Small2).Locked(true);
+        columns.Bound(p => p.Size).EditorTemplateName("SizeEditor").Width(LOVConstants.Width.Small2).Locked(true);
+        columns.Bound(p => p.Revision).EditorTemplateName("RevisionEditor").Width(LOVConstants.Width.Small2).Locked(true);
+        columns.Bound<string>(p => p.AltIdd).EditorTemplateName("AltEditor").Width(LOVConstants.Width.Small2).Locked(true).HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.QtyDZ).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @class = "ob-right" });
+        columns.Bound(p => p.TotalDozens).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @class = "ob-right" }).EditorTemplateName("TotalDozensEditor");
+        columns.Bound(p => p.LbsStr).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @class = "ob-right" }).ClientTemplate("<a class='linki2 lnkLbsStr' href='javascript:void(0)'> #=LbsStr# </a>");
+
+        columns.Bound(p => p.MC).EditorTemplateName("MCEditor").Width(LOVConstants.Width.Small2).HtmlAttributes(new { @style = "text-transform:uppercase" }); 
+        columns.Bound(p => p.CylinderSizes).Width(LOVConstants.Width.Small3B).ClientTemplate("<a class='linki2 lnkPFS' href='javascript:void(0)'> #=CylinderSizes # </a>");
+        columns.Bound(p => p.PFSInd).Width(LOVConstants.Width.Small2).ClientTemplate("<a class='linki2 lnkPFS' href='javascript:void(0)'> #=(PFSInd)?'Y':'N' # </a>");
+        columns.Bound(p => p.StartDate).Width(LOVConstants.Width.Medium1).ClientTemplate("<a class='linki2 lnkPipeDate' href='javascript:void(0)'> #=kendo.toString(StartDate,'" + LOVConstants.DateFormatDisplay + "')# </a>").EditorTemplateName("StartDateEditor");
+        columns.Bound(p => p.CurrDueDate).Width(LOVConstants.Width.Medium1).ClientTemplate("<a class='linki2 lnkPipeDate' href='javascript:void(0)'> #=kendo.toString(CurrDueDate,'" + LOVConstants.DateFormatDisplay + "')# </a>").EditorTemplateName("DueDateEditor");
+        columns.Bound(p => p.TxtPath).EditorTemplateName("TxtPathEditor").Width(LOVConstants.Width.Small2).HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.CuttPath).EditorTemplateName("CutPathEditor").Width(LOVConstants.Width.Small2).HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.SewPath).Width(LOVConstants.Width.Small2);
+        columns.Bound(p => p.Atr).Width(LOVConstants.Width.Small2); 
+        columns.Bound(p => p.MfgPath).EditorTemplateName("MFGPathPEditor").Width(LOVConstants.Width.Small2);
+        columns.Bound(p => p.DcLoc).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @style = "text-transform:uppercase" });
+        columns.Bound(p => p.ExpeditePriority).Width(LOVConstants.Width.Small3).EditorTemplateName("TotalDozensEditor");
+        //columns.Bound(p => p.CategoryCode).Width(LOVConstants.Width.Small2);
+        columns.Bound(p => p.CatCode).EditorTemplateName("CatCodeEditor").Width(LOVConstants.Width.Small2);
+        columns.Bound(p => p.DemandDriver).EditorTemplateName("WODmdDriverEditor").Width(LOVConstants.Width.Medium1);
+        columns.Bound(p => p.DemandSource).EditorTemplateName("WODemandSourceEditor").Width(LOVConstants.Width.Medium1);
+        columns.Bound(p => p.Rule).Width(LOVConstants.Width.Small2B).HtmlAttributes(new { @class = "ob-right" });
+        columns.Bound(p => p.Priority).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @class = "ob-right" });
+        //Modified By :UST(Gopikrishnan), Date:28-June-2017, Description: As per the request Created BD & Dozens Only checkbox no need to be disabled because it makes the user to click the cell first for clicking the checkbox, modification : Starts
+        //columns.Bound(p => p.CreateBd).Width(LOVConstants.Width.Small2).ClientTemplate("<input  type='checkbox' disabled='disabled' data-bind='checked: CreateBd' #= CreateBd ? checked='checked' : '' #/>").EditorTemplateName("BDEditor").Filterable(false);
+        columns.Bound(p => p.CreateBd).Width(LOVConstants.Width.Small2).ClientTemplate("<input  type='checkbox' onclick='WOM.BDCheckClick(this);' data-bind='checked: CreateBd' #= CreateBd ? checked='checked' : '' #/>").EditorTemplateName("BDEditor").Filterable(false);
+        columns.Bound(p => p.DozensOnly).Width(LOVConstants.Width.Small2).ClientTemplate("<input  type='checkbox' onclick='WOM.DZCheckClick(this)' data-bind='checked: DozensOnly' #= DozensOnly ? checked='checked' : '' #/>").EditorTemplateName("DZEditor").Filterable(false);
+        columns.Bound(p => p.BOMUpdate).Width(LOVConstants.Width.Small2).ClientTemplate("<input  type='checkbox' onclick='WOM.BOMUpdateCheckClick(this)' data-bind='checked: BOMUpdate' #= BOMUpdate ? checked='checked' : '' #/>").EditorTemplateName("BOMUpdateEditor").Filterable(false);
+        columns.Bound(p => p.Enforcement).Width(LOVConstants.Width.Small2B);
+        columns.Bound(p => p.PackCode).EditorTemplateName("PackcodeEditor").Width(LOVConstants.Width.Small2);
+        columns.Bound(p => p.MakeOrBuy).Width(LOVConstants.Width.Small2);
+        columns.Command(command => command.Custom("View").Click("WOM.ShowNote") ).Width(100).Title("Note") ;
+        columns.Bound(p => p.DemandDate).Width(LOVConstants.Width.Medium1).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+        
+        columns.Bound(p => p.SuperOrder).Width(LOVConstants.Width.Medium1);
+       // columns.Command(command =>
+                        //{
+                        //    command.Custom("EditItem").Text(" ");
+                        //});
+
+    }
+    )
+        .ToolBar(toolbar =>
+            {
+                toolbar.Custom().Name("GroupGrid").Text("Group");
+                toolbar.Custom().Name("UngroupGrid").Text("Ungroup");
+                toolbar.Custom().Name("PendingGrid").Text("Pending");
+                toolbar.Custom().Name("SelectAllGrid").Text("Select All");
+                toolbar.Custom().Name("btndeletemulti").Text("Delete");
+                toolbar.Custom().Name("btnundomulti").Text("Undo");
+                toolbar.Excel();
+            })
+                .Excel(excel => excel
+                                                        .FileName("WOM_Details_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                        .Filterable(true)
+                                                        .AllPages(true)
+                                                     )
+     .Selectable(sel =>
+                        {
+                            sel.Mode(GridSelectionMode.Multiple).Type(GridSelectionType.Row);
+                        })
+     .Navigatable(navigation => navigation.Enabled(true))
+         .Events(x => x.Edit("WOM.edit"))
+     .AutoBind(false)
+    .Filterable(filterable => filterable
+                        .Extra(false)
+                        .Operators(operators => operators
+                            .ForString(str => FilterHelper.FilterString(str))
+                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                    .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                )
+                        )
+     .Resizable(rez => rez.Columns(true))
+    .Sortable()
+    .Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                    conf.Enabled(true);
+                })       
+    .Scrollable(scroll =>
+    {
+        scroll.Enabled(true);
+        scroll.Height("500px");
+    })
+     .Events(ev => ev.DataBound("WOM.gridDataBound").Change("WOM.onRowsSelected"))
+     .Editable(editable => editable.Mode(GridEditMode.InCell))
+  .DataSource(dataSource => dataSource
+                       .Ajax()
+                       .Model(model =>
+                       {
+                            model.Id(p => p.Id);
+                            model.Field(p => p.OrderType).Editable(false);
+                            model.Field(p => p.OrderStatusDesc).Editable(true);
+                            model.Field(p => p.SellingStyle).Editable(false);
+                            model.Field(p => p.Color);
+                            model.Field(p => p.Attribute);
+                            model.Field(p => p.SizeShortDes).Editable(false);
+                            model.Field(p => p.Size);
+                            model.Field(p => p.Revision);
+                            model.Field(p => p.TotalDozens);
+                            model.Field(p => p.ExpeditePriority);
+                            model.Field(p => p.CylinderSizes).Editable(false);
+                            model.Field(p => p.QtyDZ).Editable(false);
+                            model.Field(p => p.LbsStr).Editable(false);
+                            model.Field(p => p.GroupId).Editable(false);
+                            model.Field(p => p.OrderId).Editable(false);
+                            model.Field(p => p.SuperOrder).Editable(false);
+                            model.Field(p => p.DemandDate).Editable(false);
+                            model.Field(p => p.DemandDriver); 
+                            model.Field(p => p.DemandSource);
+                            model.Field(p => p.Rule).Editable(false);
+                            model.Field(p => p.Priority).Editable(false);
+                            model.Field(p => p.Enforcement).Editable(false);
+                            model.Field(p => p.MakeOrBuy).Editable(false);
+                            model.Field(p => p.SewPath).Editable(false);
+                            model.Field(p => p.PFSInd).Editable(false);
+                            model.Field(p => p.ErrorMessage).Editable(false);     
+                     })
+                       .ServerOperation(false)
+                           .PageSize(ISS.Common.LOVConstants.DefaultPageSizes) //LOVConstants.DefaultPageSizes)
+                       .Read(read =>
+                       {
+                           read.Action("WOManagement", "Order");
+                           read.Data("WOM.searchDataWOM");
+                       })
+                      .Update(update => update.Action("UpdateRequsitionDetails", "Order"))
+    )
+  
+
+)
+<div class="clear"></div>
+<br />
+
+    <table class="ttab" width="100%">
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td>
+
+                <div class="btnContainer floatRight">
+                    @{bool? resDelete = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WO_UPDATE_SAVE);}
+                    @if (resDelete.HasValue && resDelete.Value)
+                    {
+                        <input type="submit" value="Cancel" id="btnCancel" />
+                    }
+                </div>
+
+                <div class="btnContainer floatRight">
+                    @{bool? resUpdate = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WO_UPDATE_SAVE);}
+                    @if (  (resUpdate.HasValue && resUpdate.Value))
+                    {
+                        <input type="submit" value="Save" id="btnWOMSave" />
+                    }
+                </div>
+            </td>
+            <td></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+    </table>
+
+
+    <div class="divNotePopup" style="display:none;">
+        <div style="padding:5px">
+           @Html.Hidden("hfWOMNote")
+            <textarea id="txtWOMNote" style="height:100px;" cols="50"></textarea>
+        </div> <div style="margin-top:5px;">
+            @(Html.Kendo().Button()
+                                .Name("btnWOMNote")
+                                .Tag("em")
+                                .Content("Save")
+                                .Events(ev => ev.Click("WOM.SaveNote"))
+            )
+        </div>
+    </div>
+    
+    <div class="divRevSearchPopup" style="display:none;">
+        @Html.Partial("_PKGStyleSearch", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+    <div class="divDemandPopup" style="display:none;">
+        @Html.Partial("Demandpopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+    <div class="divRevisionSearchPopup" style="display:none;">
+        @Html.Partial("_RevisionSearchPopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+}

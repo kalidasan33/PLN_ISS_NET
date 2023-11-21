@@ -1,0 +1,120 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+
+@model ISS.Core.Model.Order.WorkOrderDetail
+
+@(Html.Kendo().Grid<WorkOrderDetail>().Name("grdwrkOrderDetail").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+
+                    columns.Template(t => t.GridMode).ClientTemplate("<input type='checkbox' class ='chckbx'/>").HeaderTemplate("<label><center>All</center></label><input type='checkbox' class='chkbxHeader' Id='SelectAll'/>").Width(30);
+                    //columns.Command(command => command.Custom("EditItem").Text(" ").Click("WO.editOrderDetail")).Width(LOVConstants.Width.Small2);
+                    columns.Command(command => command.Custom("DeleteItem").Text(" ").Click("WO.deleteOrderDetail")).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Id).Width(LOVConstants.Width.Small1);
+
+                    columns.Bound(s => s.SellingStyle).Width(LOVConstants.Width.Style).EditorTemplateName("AOStyleCodeEditor");
+                    columns.ForeignKey<string>(p => p.ColorCode, new List<dynamic>(), "Color", "ColorName").EditorTemplateName("AOColorCodeEditor")
+                .Title("Color").Width(LOVConstants.Width.Color);
+                    columns.ForeignKey<string>(p => p.Attribute, new List<dynamic>(), "Attribute", "AttributeDesc").EditorTemplateName("AOAttributeCodeEditor")
+                .Title("Attribute").Width(LOVConstants.Width.Attribute);
+                    columns.ForeignKey<string>(p => p.Size, new List<dynamic>(), "Size", "SizeDesc").EditorTemplateName("AOSizeCodeEditor")
+                            .Title("Size").Width(LOVConstants.Width.Size);
+
+                    columns.Bound(s => s.Revision).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.PKGStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.MfgPathId).Width(LOVConstants.Width.Medium1).EditorTemplateName("AOMfgCodeEditor").HtmlAttributes(new { @style = "text-transform:uppercase" });
+                    columns.Bound(s => s.GarmentSKU).Width(LOVConstants.Width.Large1);
+
+                    columns.Bound(s => s.AttributionPath).Width(LOVConstants.Width.Small3);
+
+                    columns.Bound(s => s.DozenStr).Width(LOVConstants.Width.Small3).EditorTemplateName("AOSumQtyEditor");
+                    columns.Bound(s => s.PackCode).Width(LOVConstants.Width.Small3).EditorTemplateName("AOPackCodeEditor");//
+                    columns.Bound(s => s.PriorityCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.BulkNumber).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.Note).Width(50)
+                    .ClientTemplate("<span class='k-icon k-i-pencil cnote'></span>");
+                    columns.Bound(s => s.ErrorMessage).Width(50)
+                     .ClientTemplate("<a class='#=(ErrorStatus) ? 'k-icon k-warning ctooltip':' '#' title=\"#=(ErrorStatus) ? ErrorMessage:' '#\">  </a> ");
+                    //columns.Bound(s => s.ActualLbs).Width(LOVConstants.Width.Small3).Hidden();
+                    //columns.Bound(s => s.AssortCode).Width(LOVConstants.Width.Small3).Hidden();
+                    //columns.Bound(s => s.Note).Width(LOVConstants.Width.Medium1);
+                    //columns.Command(command => command.Custom("Sizes").Click("enterSizes"));
+
+                }
+                        )
+                                .ToolBar(toolbar =>
+                                {
+                                    toolbar.Create();
+                                    //toolbar.Custom().Name("addNew").Text("Add new record");
+                                    toolbar.Custom().Text("Duplicate").Name("btnWODuplicate");
+                                    //toolbar.Custom().Name("GroupGrid").Text("Group");
+                                    //toolbar.Custom().Name("UngroupGrid").Text("Ungroup");
+
+                                })
+
+                        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Cell))
+        //.Events(e => e.Change("WO.onGridChange").DataBound("WO.gridDetailBond").Edit("WO.editDataItem")
+        //.Save("WO.saveDataItem")
+        //)
+        //.Events(e => e.Change("WO.onGridChange").DataBound("WO.gridDetailBond").Edit("WO.editDataItem")
+        //        .Save("WO.saveDataItem")
+        //            .Edit("WO.cellOnEdit")
+        //    )
+            .Events(ev => ev.DataBound("WO.gridAODataBound").Change("WO.onRowsAOSelected"))
+        .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .Navigatable(navigation => navigation.Enabled(true))
+        .Events(x => x.Edit("WO.edit"))
+    .AutoBind(false)
+    .Sortable()
+    .Scrollable(scroll =>
+    {
+        scroll.Enabled(true);
+        scroll.Height("auto");
+    })
+
+    .DataSource(dataSource => dataSource
+        .Ajax()
+            .Model(model =>
+                {
+                    model.Id(p => p.Id);
+                    model.Field(p => p.Id).Editable(false);
+                    model.Field(p => p.SellingStyle);
+                    model.Field(p => p.ColorCode);
+                    model.Field(p => p.Attribute);
+                    model.Field(p => p.Size);
+                    model.Field(p => p.Revision);
+                    model.Field(p => p.PKGStyle);
+                    model.Field(p => p.MfgPathId);
+                    model.Field(p => p.GarmentSKU).Editable(false);
+                    model.Field(p => p.AttributionPath).Editable(false);
+                    model.Field(p => p.DozenStr);
+                    model.Field(p => p.PackCode);
+                    model.Field(p => p.PriorityCode);
+                    model.Field(p => p.Lbs).Editable(false);
+                    model.Field(p => p.PackCode);
+                    model.Field(p => p.CategoryCode);
+                    model.Field(p => p.PriorityCode);
+                    model.Field(p => p.BulkNumber);
+                    model.Field(p => p.CylinderSizes).Editable(false);
+                    model.Field(p => p.Note);
+                    model.Field(p => p.ActualLbs);
+                    model.Field(p => p.AssortCode);
+                    //model.Field(p => p.PurchaseOrder);
+                    //model.Field(p => p.LineItem);
+                    //model.Field(p => p.DemandDriver);
+                    model.Field(p => p.ErrorMessage).Editable(false);
+
+                })
+        .ServerOperation(false)
+        .Batch(true)
+
+        )
+)
+
+

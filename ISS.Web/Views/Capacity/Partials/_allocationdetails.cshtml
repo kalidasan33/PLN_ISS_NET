@@ -1,0 +1,68 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Capacity;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model System.Data.DataTable
+
+<label id="FilteredColumns" class="display-filters"></label>
+<input type="hidden" id="capType" />
+<input type="hidden" id="wc" />
+<input type="hidden" id="wcPlant" />
+<input type="hidden" id="status" />
+<input type="hidden" id="SpillOver" />
+<input type="hidden" id="PlanDate" />
+
+@(Html.Kendo().Grid(Model)
+                      .Name("grdAllocations").HtmlAttributes(new { @class = "kgridheightsmall" })
+              .Columns(columns =>
+               {
+                   foreach (System.Data.DataColumn column in Model.Columns)
+                   {
+                       var c = columns.Bound(column.DataType, column.ColumnName).Width(LOVConstants.Width.Medium3);
+                       if (column.ColumnName == "Plant" || column.ColumnName == "Workcenter" || column.ColumnName == "Type")                       
+                       {
+                           c.Column.Locked = true;
+                       }
+                       if (column.ColumnName == "ProductionStatus" || column.ColumnName == "SpillOver" || column.ColumnName == "Plant1" || column.ColumnName == "Workcenter1" || column.ColumnName == "Type1" || column.ColumnName == "CapacityGroup")
+                       {
+                           c.Hidden();
+                       }
+                       if (column.ColumnName.Contains("_"))
+                       {
+                           DateTime dt = DateTime.ParseExact(column.ColumnName, "MMM_dd_yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                           c.Title(dt.ToString("MM/dd/yyyy"));
+                           c.HtmlAttributes(new { @class = "ob-right" });
+                           c.ClientTemplate("#if(Type1 != null && Type1 != '' && " + column.ColumnName + " !='0' && " + column.ColumnName + " !='N/A'){#<a class='linki2' href='javascript:void(0)'> #=" + column.ColumnName + "# </a>#}else if(" + column.ColumnName + " != null){##=" + column.ColumnName + "##}#");
+                       }
+                        if (column.ColumnName == "Prior")
+                        {
+                            c.HtmlAttributes(new { @class = "ob-right" });
+                            c.Column.Visible = false; // Added by Cijith on 4/17 to hide the Prior column as per RDT#128829
+                       }
+
+                   }
+               }
+                    )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                })
+                .Resizable(resizing => resizing.Columns(true))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Model(model =>
+                            {
+                                foreach (System.Data.DataColumn column in Model.Columns)
+                                {
+                                    model.Field(column.ColumnName, column.DataType);
+                                }
+                            })
+                    .ServerOperation(false)  )
+                   
+                
+)
+
+

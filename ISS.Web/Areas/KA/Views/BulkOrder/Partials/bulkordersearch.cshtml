@@ -1,0 +1,172 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using KA.Core.Model.BulkOrder;
+@model BulkOrderSearch
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        requisitions.const.searchFromDate = '@Model.FromDate.Value.ToShortDateString()';
+        requisitions.const.searchToDate = '@Model.ToDate.Value.ToShortDateString()';
+    });
+</script>
+
+@using (Html.BeginForm("", "", FormMethod.Get, new { Id = "frmBulkOrdSearch" }))
+    {
+<div id="bulkSearch">
+    <table class="ttab">
+        <tr>
+            <td>
+                @Html.LabelFor(m => m.BulkNumber)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.LabelFor(m => m.FromDate)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.LabelFor(m => m.ToDate)
+            </td>
+            <td class="dspace"> </td>
+            <td></td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td>
+                @Html.Kendo().TextBoxFor(r => r.BulkNumber).HtmlAttributes(new { @class = "uppercase" })
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.Kendo().DatePickerFor(d => d.FromDate)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.Kendo().DatePickerFor(d => d.ToDate)
+            </td>
+            <td class="dspace"> </td>
+
+            <td class="buttonalign">
+                <div class="btnContainer floatRight searchalign">
+                    <input type="submit" value="Search" id="btnBulkOrderSearch" />
+                </div>
+            </td>
+            <td class="dspace"> </td>
+
+
+            <td class="buttonalign">
+                <div class="btnContainer floatRight">
+                    <input type="reset" value="Clear" id="btnRequisitionSearchClear" />
+                </div>
+
+            </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td>
+                @Html.CheckBoxFor(d => d.ExcludeProcessed)
+                @Html.CustomLabelFor(d => d.ExcludeProcessed)
+
+        </td>
+            <td class="dspace"> </td>
+            <td colspan="4">
+                <label id="lblReqDateError" style="color:red;"></label>
+            </td>
+
+            @*<td colspan="3">
+                <div class="btnContainer floatRight">
+                    <input type="submit" id="btnRequisitionSearchExport" class="excel_btn" />
+
+                </div>
+            </td>*@
+        </tr>
+        <tr class="blankrow1"></tr>
+    </table>
+    @*<br />*@
+    <label id="FilteredSearchColumns" class="display-filters"></label>
+
+
+
+    @(Html.Kendo().Grid<BulkOrderDetail>().Name("grdBulkSearch").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click("requisitions.selectRequisition")).Width(ISS.Common.LOVConstants.Width.Small2).Title("Select");
+                            columns.Bound(s => s.BulkNumber).Width(ISS.Common.LOVConstants.Width.Medium1);
+                            columns.Bound(s => s.ProcessedToOS).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.DmdWkEndDate).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorNo).Width(ISS.Common.LOVConstants.Width.Small1);
+                            columns.Bound(s => s.LwVendorLoc).Width(ISS.Common.LOVConstants.Width.Small1);
+                            columns.Bound(s => s.MFGPathId).Width(ISS.Common.LOVConstants.Width.Small1);
+                            columns.Bound(s => s.DcLoc).Width(ISS.Common.LOVConstants.Width.Small1);
+                            columns.Bound(s => s.ProgramSourceDesc).Width(ISS.Common.LOVConstants.Width.Medium3);
+                        }
+                        )
+                                     .ToolBar(toolbar =>
+                                                        {
+                                                            toolbar.Excel();
+                                                        })
+                                                        .Excel(excel => excel
+                                                            .FileName("BulkOrderSearchDetails" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                            .Filterable(true)
+                                                            .AllPages(true)
+                                                         )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        })
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                        .Filterable(filterable => filterable
+                            .Extra(false)
+                            .Operators(operators => operators
+                                .ForString(str => ISS.Web.Helpers.FilterHelper.FilterString(str))
+                                .ForNumber(num => ISS.Web.Helpers.FilterHelper.FilterNumber(num))
+                                .ForDate(dte => ISS.Web.Helpers.FilterHelper.FilterDate(dte))
+
+                            )
+                        )
+                        .Sortable()
+                                        .Events(e => e.DataBound("requisitions.dataBound"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("BulkOrderSearchDetails","bulkorder");
+                                read.Data("requisitions.searchDataRequisition");
+
+                            })
+
+
+                        )
+
+    )
+</div>
+ }
+
+
+<style>
+    #frmBulkOrdSearch .k-grid-content {
+        min-height: 100px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        white-space: normal;
+    }
+
+    #frmBulkOrdSearch .uppercase {
+        text-transform: uppercase;
+    }
+
+    .highlighted-row {
+        color: red;
+    }
+</style>  

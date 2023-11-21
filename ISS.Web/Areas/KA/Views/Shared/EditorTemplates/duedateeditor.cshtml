@@ -1,0 +1,6 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@model DateTime?
+@(Html.Kendo().DatePickerFor(m => m)
+      .Format("MM/dd/yyyy")
+)

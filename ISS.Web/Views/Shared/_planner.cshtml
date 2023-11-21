@@ -1,0 +1,63 @@
+﻿@using ISS.Core.Model.Order;
+@model SummaryFilterModal
+
+<div class="planner-section">
+    <button class="k-button" onclick="return ISS.common.multiselectAll('Planner', 'PlannerCd')" style="font-size:10px;">Select All</button>
+    <button class="k-button" onclick="return ISS.common.multiunselectAll('Planner')" style="font-size:10px;">UnSelect All</button>
+    @(Html.Kendo().MultiSelectFor(m=>m.Planner)
+    .Placeholder("Select Planners...")
+    .AutoClose(false)
+    .DataSource(source =>
+        {
+            source.Custom()
+                    .ServerFiltering(false)
+                    .Type("aspnetmvc-ajax")
+                    .Transport(transport =>
+                    {
+                        transport.Read("GetPlanner", "Shared");
+                    })
+                    .Schema(schema =>
+                    {
+                        schema.Data("Data");
+                    });
+        })
+    .Events(e =>
+    {
+        e.Change("onPlannerClose");
+        //e.Close("onPlannerClose");
+        //e.DataBound("onPlannerDataBound");
+    })
+    .DataTextField("PlannerCd")
+    .DataValueField("PlannerCd")
+)
+
+
+</div>
+
+<script>
+    $(document).ready(function () {
+       
+  
+    });
+    function onPlannerClose(e) {
+        var wcMultiSelect = $("#WorkCenter").data("kendoMultiSelect");
+        wcMultiSelect.dataSource.read();
+    }
+
+    function onPlannerDataBound(e) {
+        if ($("#Planner").data("kendoMultiSelect").value().length>0)
+            onPlannerClose();
+    }
+
+</script>
+<style scoped>
+        
+            .planner-section h2 {
+                font-weight: normal;
+            }
+
+         
+          
+
+
+    </style>

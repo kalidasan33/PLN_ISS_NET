@@ -1,0 +1,383 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Textiles;
+@using ISS.Common;
+@using System.Web.Mvc;
+
+@model TextilesSearch
+@{
+
+    ViewBag.Title = "Textile Allocation";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/Textiles" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        textiles.docTextilesReady();
+
+        textiles.const.urlGetWOM = '@Url.Action("WOManagement", "order")';
+
+       
+    });
+</script>
+<style>
+    .not-active {
+ pointer-events: none;
+ cursor: default;
+ text-decoration:none !important;
+}
+</style>
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+@using (Html.BeginForm("ExportOverviewAllocations", "Textiles", FormMethod.Post, new { Id = "frmTextiles" }))
+{
+    <input type="hidden" name="filteredData" id="filteredData" />
+    <input type="hidden" id="planYear" />  
+<div class="expand planForm1 form1 width100 textileDiv" id="contentDiv">
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Events(ev => ev.Activate("textiles.onPanelActivate"))
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Selection Criteria")
+            .Content(@<div>
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.CustomLabelFor(d => d.BusinessUnit)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.CustomLabelFor(d => d.TextileGroup)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.FromWYear)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.ToWYear)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.Planner)</td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('BusinessUnit', 'BusinessUnit')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('BusinessUnit')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelectFor(m => m.BusinessUnit)
+                                            .Placeholder("Select business unit...")
+                                            .AutoClose(false)
+                                            .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetBusinessContact", "Shared");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    })
+                                                    .Events(ev=> ev.Change("textiles.onBusUnitChange"))
+                                            .DataTextField("BusinessUnit")
+                                            .DataValueField("BusinessUnit")
+                                            .Filter(FilterType.StartsWith)
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <div style="width:275px; ">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('TextileGroup', 'FabricGroup')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('TextileGroup')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelectFor(m => m.TextileGroup)
+                                            .Placeholder("Select textile group...")
+                                            .AutoClose(false)
+                                             
+                                            .DataSource(source =>
+                                                    {
+                                                        source.Read(con =>
+                                                            con.Action("GetTextileGroup", "Shared")
+                                                            .Data("textiles.fabricData")
+                                                            );
+                                                            //source.Custom()
+                                                            //        .ServerFiltering(false)
+                                                            //        .Type("aspnetmvc-ajax")
+                                                            //        .Transport(transport =>
+                                                            //        {
+                                                            //            transport.Read("GetTextileGroup", "Shared");
+                                                            //        })
+                                                            //        .Schema(schema =>
+                                                            //        {
+                                                            //            schema.Data("Data");
+                                                            //        });
+                                                    })                                            
+                                            .DataTextField("FabricGroup")
+                                            .DataValueField("FabricGroup")
+                                            .Filter(FilterType.StartsWith)
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <div style="width:100px; height: 20px;" class="">
+                                    @(Html.Kendo().DropDownListFor(m => m.FromWYear)
+                                                      .DataTextField("Text")
+                                                      .DataValueField("Value")
+                                                      .HtmlAttributes(new { @class = "widthm" })
+                                                              .Events(ev => ev.Select("textiles.onFromYearChange").DataBound("textiles.onFromYearDataBound"))
+                                                             
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                  .ServerFiltering(false)
+                                                                  .Type("aspnetmvc-ajax")
+                                                                  .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetPlanWeekYear", "Shared");
+                                                                    })
+                                                                  .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        })
+                                    )
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <div style="height: 20px;" class="">
+                                    @(Html.Kendo().DropDownListFor(m => m.ToWYear)
+                                                      .DataTextField("Text")
+                                                      .DataValueField("Value")
+                                                              .HtmlAttributes(new { @class = "widthm" })
+                                                      //.DataSource(source =>
+                                                      //  {
+                                                      //      source.Custom()
+                                                      //              .ServerFiltering(false)
+                                                      //              .Type("aspnetmvc-ajax")
+
+                                                      //              .Transport(transport =>
+                                                      //              {
+                                                      //                  transport.Read("GetPlanWeekYear", "Shared");
+                                                      //              })
+                                                      //              .Schema(schema =>
+                                                      //              {
+                                                      //                  schema.Data("Data");
+                                                      //              });
+                                                      //  })
+                                    )
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.TextBoxFor(m => m.Planner, new { @class = "clsupper", style = "height:27px" })
+                            </td>
+                            <td class="dspace"> </td>
+                        </tr>                       
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>@Html.CheckBoxFor(m => m.IsSuggestedLotIncluded) @Html.LabelFor(m => m.IsSuggestedLotIncluded) </td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+
+                        <tr>
+                            <td colspan="9">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="btnTextilesSearch" />
+                                    <input type="reset" value="Clear" id="btnTextileClear" />
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr><td colspan="9">
+                                <div id="LoadMessage" style="display:none"> </div>
+                            </td></tr>
+                    </table>
+                    <div class="clear floatRight"></div>
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Filter Criteria").HtmlAttributes(new { @class = "filtercssClass" })
+            .Content(@<div>
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>Plant</td>
+                            <td>Head Size</td>
+                            <td>Cut Size</td>
+                            <td>Dye/Bleach</td>
+                            <td>Machine</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterPlant', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterPlant')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterPlant")
+                                                  .Placeholder("Select plant...")                                                                                                  
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.plantFillData");
+                                                                    });                                                                    
+                                                                })
+                                                  .Events(ev => ev.Change("textiles.onPlantChange"))
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterHeadSize', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterHeadSize')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterHeadSize")
+                                                  .Placeholder("Select head size...")
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.headFillData");                                                                            
+                                                                    });                                                                    
+                                                                })
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterCutSize', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterCutSize')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterCutSize")
+                                                  .Placeholder("Select cut size...")
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.cutFillData");
+                                                                    });
+                                                                })
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterDye', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterDye')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterDye")
+                                                  .Placeholder("Select dye/bleach...")
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.dyeFillData");
+                                                                    });
+                                                                })
+                                    )
+                                    
+                                </div>
+                            </td>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterMachine', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterMachine')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterMachine")
+                                                  .Placeholder("Select machine...")
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.machineFillData");
+                                                                    });
+                                                                })
+                                    )
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr><td>Yarn Item</td></tr>
+                        <tr>
+                            <td>
+                                <div style="width:175px;">
+                                    <button class="k-button" onclick="return ISS.common.multiselectAll('FilterYarn', '')" style="font-size:10px;">Select All</button>
+                                    <button class="k-button" onclick="return ISS.common.multiunselectAll('FilterYarn')" style="font-size:10px;">UnSelect All</button>
+                                    @(Html.Kendo().MultiSelect()
+                                                  .Name("FilterYarn")
+                                                  .Placeholder("Select yarn item...")
+                                                  .DataSource(source =>
+                                                                {
+                                                                    source.Read(read =>
+                                                                    {
+                                                                        read.Action("GetFilters", "Textiles")
+                                                                            .Data("textiles.yarnFillData");
+                                                                    });
+                                                                })
+                                    )
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td colspan="9">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Filter" id="btnTextilesFilter" /> &nbsp;
+                                    @*<input type="submit" data-url="@Url.Action("WOManagement","Order")" value="Jump to Workorder" id="btnJumptoWorkorder" />*@
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                    </table>
+                </div>);
+            panelbar.Add().Text("Head Sizes").HtmlAttributes(new { @class="headcssClass"})
+              .Content(@<div id="TextileHead" class="panelbottom">
+    @Html.Partial("_headSizeDetails", new System.Data.DataTable())
+
+</div>);
+            panelbar.Add().Text("Dye/Bleach Mix")
+             .Content(@<div id="TextilesDye" class="panelbottom">
+    @Html.Partial("_dyeBleachDetails", new System.Data.DataTable())
+</div>);
+            panelbar.Add().Text("Machine Utilization").HtmlAttributes(new { @class = "machinecssClass" })
+             .Content(@<div id="TextilesMachine" class="panelbottom">
+    @Html.Partial("_machineUtilization", new System.Data.DataTable())
+</div>);
+            panelbar.Add().Text("Yarn").HtmlAttributes(new { @class = "yarncssClass" })
+             .Content(@<div id="TextilesYarn" class="panelbottom">
+    @Html.Partial("_yarnDetails", new System.Data.DataTable())
+</div>);
+            panelbar.Add().Text("Fabric").HtmlAttributes(new { @class = "fabriccssClass" })
+             .Content(@<div id="TextilesFabric" class="panelbottom">
+    @Html.Partial("_fabricDetails", new System.Data.DataTable())
+</div>);
+            panelbar.Add().Text("Print").HtmlAttributes(new { @class = "printcssClass" })
+             .Content(@<div id="TextilesPrint" class="panelbottom">
+    @Html.Partial("_printDetails", new System.Data.DataTable())
+</div>);
+        })
+)
+        <div class="panelbottom"></div>
+    </div>
+}
+
+<style>
+    .textileDiv .k-grid{
+        margin-left:10px;
+    }
+</style>

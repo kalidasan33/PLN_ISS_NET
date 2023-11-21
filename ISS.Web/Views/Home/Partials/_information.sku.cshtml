@@ -1,0 +1,36 @@
+﻿@using Kendo.Mvc.UI;
+@(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .ImageUrl(Url.Content("~/images/icon_print.png"))
+                .Content(@<div> <table style="margin:20px;border:1px; padding:5px; "><tr><td>Style</td><td><input type="text" style="margin-left:5px;" id="exceptionValue" /></td><td><input type="submit" value="Search" style="margin-left:5px;" onclick="loadSkuInformation()" /></td></tr></table></div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .ImageUrl(Url.Content("~/images/icon_print.png"))
+            .Content(@<div id="skuResults">
+                @(Html.Kendo().Grid<ISS.Core.Model.SkuPath>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.STYLE_CD).Width(200);
+        columns.Bound(p => p.COLOR_CD).Width(200);
+        columns.Bound(p => p.ATTRIBUTE_CD).Width(200);
+        columns.Bound(p => p.SIZE_CD).Width(200);
+    })
+    .Pageable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+                    .Read(read => read.Action("GetSkuPaths", "Home"))
+     )
+                )
+            </div>).Expanded(true);
+        }
+                        )
+)

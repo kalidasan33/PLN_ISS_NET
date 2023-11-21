@@ -1,0 +1,20 @@
+﻿
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetColorCodes", "Order", new { area = "" }).Type(HttpVerbs.Post).Data("WO.retrieveAOColorData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Color")
+  .DataTextField("ColorName")
+  .Events(e =>
+  {
+      e.Change("WO.onColorChanged");
+  })
+)
+

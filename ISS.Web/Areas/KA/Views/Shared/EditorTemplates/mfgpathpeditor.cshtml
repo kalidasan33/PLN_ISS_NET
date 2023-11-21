@@ -1,0 +1,14 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetKAMFGPathId", "AttributionOrder").Type(HttpVerbs.Post).Data("WOM.MFGFilterData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("MfgPathId")
+  .DataTextField("MfgPathId")
+  .Events(e => e.Change("WOM.MfgPathChange"))
+)

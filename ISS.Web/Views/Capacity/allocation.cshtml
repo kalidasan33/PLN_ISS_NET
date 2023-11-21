@@ -1,0 +1,234 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Capacity;
+@using ISS.Common;
+@using System.Web.Mvc;
+
+@model CapacitySearch
+@{
+
+    ViewBag.Title = "Capacity Utilization";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/Capacity" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        Capacity.docCapacityReady();
+    });
+</script>
+
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("ExportAllocations", "Capacity", FormMethod.Post, new { Id = "frmAllocations" }))
+{
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Events(ev => ev.Activate("Capacity.onPanelActivate"))
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Selection Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.CustomLabelFor(d => d.CapacityGroup)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.CustomLabelFor(d => d.Plant)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.CustomLabelFor(d => d.WorkCenter)</td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                        <div style=" width:200px;" class="contentd1">
+                            @(Html.Kendo().MultiSelectFor(m => m.CapacityGroup)
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .AutoClose(false)
+                                    .Placeholder("Select Capacity...")
+                                    .Events(e => e.Change("Capacity.OnCapacityChange").Open("Capacity.openCapacity"))
+                                    .DataSource(source =>
+                                    {
+                                        source.Custom()
+                                                .ServerFiltering(false)
+                                                .Type("aspnetmvc-ajax")
+                                                .Transport(transport =>
+                                                {
+                                                    transport.Read("GetAllCapacityGroup", "Capacity");
+                                                })
+                                                .Schema(schema =>
+                                                {
+                                                    schema.Data("Data");
+                                                });
+                                    })
+                            )
+                        </div>
+                            </td>
+                    <td class="dspace"> </td>
+                    <td>
+                        <div style=" width:375px;">
+                            <button class="k-button" onclick="return ISS.common.multiselectAll('Plant', 'Plant_cd')" style="font-size:10px;">Select All</button>
+                            <button class="k-button" onclick="return ISS.common.multiunselectAll('Plant')" style="font-size:10px;">UnSelect All</button>
+                            @(Html.Kendo().MultiSelectFor(m => m.Plant)
+                            .Placeholder("Select Plant...")
+                            .AutoClose(false)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPlant", "Shared")
+                                    .Data("Capacity.onCapacityPlantData");
+                                });
+                                source.ServerFiltering(false);
+                            })
+                            .Events(e =>
+                                    {
+                                        e.Change("Capacity.OnPlantChange");
+                                    })
+                        .DataTextField("Plant_cd")
+                        .DataValueField("Plant_cd")
+                            )
+
+                        </div>
+
+                    </td>
+                    <td class="dspace"> </td>
+                            <td>
+                        <div style=" width:375px;">
+                            <button class="k-button" onclick="return ISS.common.multiselectAll('WorkCenter', 'WorkCenter_Cd')" style="font-size:10px;">Select All</button>
+                            <button class="k-button" onclick="return ISS.common.multiunselectAll('WorkCenter')" style="font-size:10px;">UnSelect All</button>
+                            @(Html.Kendo().MultiSelectFor(m => m.WorkCenter)
+                            .Placeholder("Select Workcenter...")
+                            .AutoClose(false)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllocationWorkCenter", "Shared")
+                                    .Data("Capacity.onCapacityGrpData");
+                                });
+                                source.ServerFiltering(false);
+                            })
+                            .DataTextField("WorkCenter_Cd")
+                            .DataValueField("WorkCenter_Cd")
+                                    )
+                                    
+                                </div>
+                    </td>
+                    <td class="dspace"> </td>
+                </tr>
+                                 
+
+            </table>
+            <div class ="k-content">
+                    <table>
+                        <tr>
+                            <td class="dspace"> </td>
+                            <td>
+                                <div style=" width:300px;" class="floatLeft">
+                                    @(Html.Kendo().CheckBox().Name("CapIndView").Checked(true).Label("Individual View"))
+                                    @(Html.Kendo().CheckBox().Name("CapAggView").Checked(true).Label("Aggregate View"))
+                                </div>
+                            </td>
+                            <td>
+                                <div style=" width:75px;">
+                                    @Html.CustomLabelFor(d => d.OrderBy)
+                                </div>
+                            </td>
+                            <td>
+
+                                <div style=" width:200px;" class="contentd1">
+                                    @(Html.Kendo().DropDownListFor(m => m.OrderBy)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .SelectedIndex(0)
+    .Events(e => e.Change("Capacity.OnOrderByChange"))
+    .DataSource(source =>
+    {
+        source.Custom()
+                .ServerFiltering(false)
+                .Type("aspnetmvc-ajax")
+                .Transport(transport =>
+                {
+                    transport.Read("GetCapacitySortDirections", "Capacity");
+                })
+                .Schema(schema =>
+                {
+                    schema.Data("Data");
+                });
+    })
+                                    )
+
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="floatLeft">
+                                    <a href="#" onclick="return Capacity.onAggregateClick()">Aggregate Table Data</a>
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <div style=" width:200px;" class=" floatRight">
+
+                                    <input type="submit" value="Search" id="btnAllocationsSearch" />
+                                    <input type="reset" value="Clear" id="btnAllocationsClear" />
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="9">
+                                <div id="LoadIcon"> </div>
+                            </td>
+                        </tr>
+
+                    </table>
+            </div>
+        <div class="clear floatRight"></div>
+
+                    <div class="clear floatRight"></div>
+
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results").HtmlAttributes(new { @class = "resultClass" })
+            .Content(@<div id="allocationResults" class="panelbottom">
+    <label id="FilteredColumns" class="display-filters"></label>
+    <div class="btnContainer floatRight">
+        <input type="submit" id="btnAllocationExport" class="excel_btn" />
+    </div>
+    <br /><br />
+    <div id="allocationDetail">
+        @Html.Partial("_allocationDetails", new System.Data.DataTable())
+    </div>
+</div>).Expanded(true);
+
+        })
+
+
+)
+
+    </div>
+}
+
+<div class="divAllocationPopup" style="display:none;">
+    @Html.Partial("_allocationSearch", new AllocationPopup())
+</div>
+    
+<div class="divAggregatePopup" style="display:none;">
+   
+    @Html.Partial("_aggregateDetails", new AggregatePopup())
+</div>

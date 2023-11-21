@@ -1,0 +1,56 @@
+﻿@using ISS.Core.Model.Textiles;
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Common;
+
+@model  System.Data.DataTable
+
+@(Html.Kendo().Grid(Model)
+              .Name("grdHead")                            
+              .Columns(columns =>
+               {
+                   foreach (System.Data.DataColumn column in Model.Columns)
+                   {
+                       var c = columns.Bound(column.DataType, column.ColumnName).Width(LOVConstants.Width.Medium3);
+
+                       if ((column.ColumnName == "HeadSize" || column.ColumnName == "PlantCut") && Model.Columns.Count > 10)
+                       {
+                           c.Column.Locked = true;                           
+                       }
+                       if (column.ColumnName == "PlantCut")
+                       {
+                           c.Title("Plant/Cut");                           
+                       }
+                       if (column.ColumnName.Contains("_"))
+                       {
+                           c.Title(column.ColumnName.Substring(1));
+                           c.HtmlAttributes(new { @class = "ob-right" });
+                       }
+                       if (column.ColumnName == "Total")
+                       {
+                           c.HtmlAttributes(new { @class = "ob-right" });
+                       } 
+                   }
+               }
+                    )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                })
+                
+                .Resizable(resizing => resizing.Columns(true))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Model(model =>
+                            {
+                                foreach (System.Data.DataColumn column in Model.Columns)
+                                {
+                                    model.Field(column.ColumnName, column.DataType);
+                                }
+                            })
+                    .ServerOperation(false)                   
+                   
+                )
+               .Events(ev => ev.DataBound("textiles.onTextileGridDataBound"))
+)

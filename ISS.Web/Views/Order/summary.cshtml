@@ -1,0 +1,457 @@
+﻿@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model SummaryFilterModal
+
+
+
+@{
+    ViewBag.Title = "Summary";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        summary.docSummaryReady();
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+            <text>
+        setTimeout('summary.loadSummaryGrid()', 1000);
+        location.hash = 'autoLoad'
+        </text>
+
+        }
+
+        summary.const.urlGetWOM = '@Url.Action("WOManagement", "order")'
+        summary.const.urlGetSO = '@Url.Action("CreateRequisitions", "order")'
+        summary.const.urlGetExceptions = '@Url.Action("SuggestedExceptions", "Information")'
+        summary.const.urlGetAWOM = '@Url.Action("Management", "AttributionOrder", new { Area = "KA" })'
+    });
+</script>
+
+
+
+<h1 class="contentTitle">Summary</h1>
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmSummary" }))
+{
+    <input type="hidden" name="FiltersData" id="FiltersData" />
+    <input type="hidden" name="request" id="request" />
+    <div class="planForm">
+
+
+        <div class="expand  width100" id="contentDiv">
+
+            @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Selection Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+
+                        <tr>
+
+                            <td colspan="2">
+                                @Html.LabelFor(m => m.Planner)
+
+                                @*<div id="partialPlaceHolder" style="  height: 20px;">*@
+                                @Html.Partial("_Planner")
+                                @*</div><br /><br />*@
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.LabelFor(m => m.CapacityGroup)
+
+                                <div style="height: 20px;" class="contentd1">
+                                    @(Html.Kendo().DropDownListFor(m => m.CapacityGroup)
+                                            //.Name("capacityGroup")
+                                                      .DataTextField("PlannerCd")
+                                                      .DataValueField("PlannerCd")
+                                                      .Events(e => e.Change("summary.OnCapacityChange"))
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                    .ServerFiltering(false)
+                                                                    .Type("aspnetmvc-ajax")
+                                                                    .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetCapacityGroup", "Order");
+                                                                    })
+                                                                    .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        })
+                                    )
+                                </div>
+                            </td>
+                            @*<td class="dspace"> </td>*@
+                            <td colspan="2" style="padding-left:10px;">
+                                @Html.LabelFor(m => m.WorkCenter)
+                                @*<div id="workCenterPlaceHolder" style=" width:200px; height: 20px;">*@
+                                @Html.Partial("_WorkCenter")
+                                @*</div><br /><br />*@
+                            </td>
+
+                            @*<td>&nbsp; </td>*@
+                            <td colspan="2">
+                                @Html.LabelFor(m => m.CorpDiv)
+
+                                @*<div id="partialPlaceHolderCorp" style="width:187px;   height: 20px;">*@
+                                @Html.Partial("_CorpDivision")
+                                @*</div>*@
+                            </td>
+
+                        </tr>
+                        <tr style="height:28px;"></tr>
+
+                        <tr>
+
+                            <td>
+                                <div style="width:95px;padding-left:5px">
+                                    @Html.LabelFor(m => m.Style)
+                                    @Html.Kendo().TextBoxFor(r => r.Style).HtmlAttributes(new { @class = "txt", maxlength = 8 })
+                                </div>
+                            </td>
+
+                            <td>
+                                <table style="width:210px">
+                                    <tr>
+                                        <td>
+                                            <div style="width:95px;padding-left:5px">
+                                                @*<label for="color" style="text-align:left;">Color</label>*@
+                                                @Html.LabelFor(m => m.Color)
+                                                @Html.Kendo().TextBoxFor(r => r.Color).HtmlAttributes(new { @class = "txt", style = "width:95px", maxlength = 4 })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="width:95px;padding-left:7px">
+                                                @*<label for="size" style="text-align:left;">Size</label>*@
+                                                @Html.LabelFor(m => m.Size)
+                                                @Html.Kendo().TextBoxFor(r => r.Size).HtmlAttributes(new { @class = "txt", style = "width:95px", maxlength = 3 })
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.LabelFor(m => m.Attribute)
+                                <button class="k-button" onclick="return ISS.common.multiselectAll('Attribute', 'Attribute')" style="font-size:10px;">Select All</button>
+                                <button class="k-button" onclick="return ISS.common.multiunselectAll('Attribute')" style="font-size:10px;">UnSelect All</button>
+                                @(Html.Kendo().MultiSelectFor(m => m.Attribute)
+                                                    .Placeholder("Select attribute...")
+                                                    .AutoClose(false)
+
+
+                                                    .DataSource(source =>
+                                                    {
+                                                        source.Read(con =>
+                                                            con.Action("GetAttribute", "Shared")
+                                                            .Data("summary.attributeData"))
+                                                            .Custom()
+                                                            .Type("aspnetmvc-ajax")
+                                                            .Schema(schema =>
+                                                            {
+                                                                schema.Data("Data");
+                                                            });
+                                                    })
+
+                                                                        .DataTextField("Attribute")
+                                                                        .DataValueField("Attribute")
+                                )
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td style="padding-left:10px;">
+                                @Html.LabelFor(m => m.RuleNo)
+
+                                <div class="contentd">
+                                    @Html.Kendo().TextBoxFor(r => r.RuleNo).HtmlAttributes(new { @class = "txt" })
+
+                                </div>
+                            </td>
+                            <td style="padding-left:10px">
+                                @Html.LabelFor(m => m.RuleDesc)
+                                <div class="contentd">
+                                    @Html.Kendo().TextBoxFor(r => r.RuleDesc).HtmlAttributes(new { @class = "txt" })
+                                </div>
+                            </td>
+                            <td> </td>
+
+                        </tr>
+                        <tr class="space"></tr>
+                        <tr>
+                            <td>
+                                <br />    @Html.CustomCheckBoxFor(m => m.ExcessSuggWOGrtr2)
+                            </td>
+                            <td><br /> @Html.CustomCheckBoxFor(m => m.ExcessSuggSpillover)</td>
+                            <td class="dspace"> </td>
+
+                            <td>
+
+                                @Html.LabelFor(m => m.SuggWO)
+                                <div class="contentd">
+                                    @(Html.Kendo().DropDownListFor(model => model.SuggWO)
+                                              .DataTextField("Text")
+                                              .DataValueField("Value")
+                                              .DataSource(source =>
+                                                {
+                                                    source.Custom()
+                                                            .ServerFiltering(false)
+                                                            .Type("aspnetmvc-ajax")
+                                                            .Transport(transport =>
+                                                            {
+                                                                transport.Read("GetSuggestedWOWeek", "Order");
+                                                            })
+                                                            .Schema(schema =>
+                                                            {
+                                                                schema.Data("Data");
+                                                            });
+                                                })
+
+                                    )
+                                </div>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td style="padding-left:10px;">
+
+                                @Html.LabelFor(m => m.PlanWeek)
+                                <div class="contentd">
+
+                                    @Html.Kendo().TextBoxFor(r => r.PlanWeek).HtmlAttributes(new { @class = "txt", @readonly = "readonly" })
+                                </div>
+                            </td>
+                            <td style="padding-left:10px">
+                                @Html.LabelFor(m => m.DisplayAs)
+                                <div class="contentd">
+                                    @(Html.Kendo().DropDownList()
+                                                  .Name("displayAS")
+                                                  .DataTextField("Text")
+                                                  .DataValueField("Value")
+                                                  .BindTo(new List<SelectListItem>() {  // From Application service
+                                                      new SelectListItem() {
+                                                          Text = "Summarized",
+                                                          Value = "Summarized"
+                                                      },
+                                                      new SelectListItem() {
+                                                          Text = "Detail by Revision",
+                                                          Value = "Detail by Revision"
+                                                      }
+                                                  })
+                                          .Value("Summarized")
+                                    )
+                                </div>
+                            </td>
+                            <td> </td>
+
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>
+                                <br />     @Html.CustomCheckBoxFor(m => m.SkuBreaks)
+                            </td>
+                            <td colspan="3"> <br />@Html.CustomCheckBoxFor(m => m.SummarizeEventDmd)</td>
+                            <td> </td>
+
+                        </tr>
+
+                        <tr>
+                            <td colspan="7">
+
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="readButton" />
+                                    <input type="reset" value="Clear" id="summaryClear" />
+
+                                    @*<input type="submit" value="Export" id="exportButton" />*@
+                                    @*@Html.ActionLink("Excel", "ExportGetSummaryDetails", "Order", "summary.searchDataSummary()", null)*@
+
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        <tr class="blankrow1"></tr>
+                    </table>
+
+
+                </div>).Expanded(true);
+
+
+
+            panelbar.Add().Text("Search Results")
+            .Content(
+            @<div id="summaryResults">
+                <label id="FilteredColumns" class="display-filters"></label>
+                @*<div class="btnContainer floatRight">
+                        <input type="submit" id="exportButton" class="excel_btn"  />
+
+                    </div>
+                    <br /><br />*@
+                @(Html.Kendo().Grid<SummaryResult>().Name("summaryGrid").Columns(
+                columns =>
+                {
+                    columns.Bound(s => s.planner_cd).Width(100).Locked(true);
+                    columns.Bound(s => s.cut_alloc).Width(100).Locked(true);
+                    columns.Bound(s => s.rule_number).Width(80).Locked(true);
+                    columns.Bound(s => s.demand_source).Width(100).Locked(true);
+                    //.ClientTemplate("#= rule_number + ' - ' + demand_source #");
+                    columns.Bound(s => s.rev_no).Width(80).Locked(true)
+                        .ClientTemplate("#= (rev_no <= 0) ? ' ' : kendo.toString(rev_no, '000') #");
+                    //.ClientTemplate("#= kendo.toString(rev_no, '000')  #");
+                    columns.Bound(s => s.selling_style_cd).Width(LOVConstants.Width.Style).Locked(true)
+                        .ClientTemplate("<a class='linki2 lnkWOMStyle' href='javascript:void(0)' > #=selling_style_cd# </a>");
+                    columns.Bound(s => s.selling_color_cd).Width(LOVConstants.Width.Color).Locked(true);
+                    columns.Bound(s => s.selling_attribute_cd).Width(LOVConstants.Width.Attribute).Locked(true)
+                    .ClientTemplate("<a class='linki2 lnkWOMAttribute' href='javascript:void(0)' > #=selling_attribute_cd# </a>");
+                    columns.Bound(s => s.size_short_desc).Width(LOVConstants.Width.Small2).Locked(true);
+
+                    columns.Bound(s => s.TotalNetDemand).Width(100).HtmlAttributes(new { @class = "ob-right" })
+                    .ClientTemplate("<a class='linki2 lnkNetDmd'  href='javascript:void(0)'> #=TotalNetDemand# </a>");
+
+                    columns.Bound(s => s.Excess).Width(80).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(s => s.ExcessLot).Width(80).HtmlAttributes(new { @class = "ob-right" })
+                        .ClientTemplate("<label class='linki2 toolLotSize' title='Lot Size #=kendo.toString(lotSize,'n2')#'> #=ExcessLot# </label>");
+                    columns.Bound(s => s.ExcessNetDemand).Width(80).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(s => s.LockOrReleaseBal).Width(80).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(s => s.Released).Width(80).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkReleasedOrder' href='javascript:void(0)' > #=Released# </a>")
+                         .HeaderTemplate("<label> Released Orders</label>");
+                    columns.Bound(s => s.Locked).Width(80).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkLockedOrder' href='javascript:void(0)' > #=Locked# </a>")
+                        .HeaderTemplate("<label> Locked Orders</label>");
+                    columns.Bound(s => s.BuyOrders).Width(60).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkSOBuyOrders' href='javascript:void(0)' > #=BuyOrders# </a>")
+                         .HeaderTemplate("<label> Buy Orders</label>");
+                    columns.Bound(s => s.SugWK1).Width(60).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                         .ClientTemplate("<a class='linki2 lnkSuggWK1' href='javascript:void(0)' > #=SugWK1# </a>")
+                        .HeaderTemplate("<label> Sugg. Orders WK1</label>");
+                    columns.Bound(s => s.SugWK2).Width(60).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkSuggWK2' href='javascript:void(0)' > #=SugWK2# </a>")
+                        .HeaderTemplate("<label>Sugg. Orders WK2</label>");
+                    columns.Bound(s => s.SugWK3Plus).Width(60).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkSugWK3Plus' href='javascript:void(0)' > #=SugWK3Plus# </a>")
+                        .HeaderTemplate("<label> Sugg. Orders WK > 2</label>");
+                    columns.Bound(s => s.SpillOver).Width(80).HtmlAttributes(new { @class = "ob-right" }).Sortable(false)
+                        .ClientTemplate("<a class='linki2 lnkSpillOver' href='javascript:void(0)' > #=SpillOver# </a>")
+                        .HeaderTemplate("<label>Sugg. Spillover</label>");
+
+                    columns.Bound(s => s.SuggestedLotsComments).Width(230)
+                        .ClientTemplate("<a class='linki2 lnkSuggComments' href='javascript:void(0)' > #if (SuggestedLotsComments == null) {# #=''# #} else {# #=SuggestedLotsComments# #}# </a>");
+                    //.ClientTemplate("<a class='linki2 lnkSuggComments' href='javascript:void(0)' > #=SuggestedLotsComments# </a>");
+                }
+                )
+                                .ToolBar(toolbar =>
+                                                {
+                                                    toolbar.Excel();
+                                                })
+                                                .Excel(excel => excel
+                                                    .FileName("Summary" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                    .Filterable(true)
+                                                    //.ProxyURL(Url.Action("ExportGetSummaryDetails", "Order", new { Area = "" }))
+                                                    .AllPages(true)
+                                                 )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height(700);
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                    conf.Enabled(true);
+                })
+
+                        .Sortable().Events(ev => ev.DataBound("summary.summaryGridDataBoundStyle"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                    .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("Summary", "Order");
+                        //read.Url("Order/Summary");
+                        read.Data("summary.searchDataSummary");
+                    })
+                )
+               .Events(e => e.DataBound("summary.dataBound"))
+               .Filterable(filterable => filterable
+                   .Extra(false)
+                   .Operators(operators => operators
+
+                   .ForString(str => FilterHelper.FilterString(str))
+                   .ForNumber(num => FilterHelper.FilterNumber(num))
+                   .ForDate(dte => FilterHelper.FilterDate(dte))
+                             )
+                   )
+
+
+                )
+
+
+
+
+
+            </div>).Expanded(true);
+
+        })
+
+
+            )
+
+        </div>
+
+    </div>
+
+
+}
+
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmNetDmd" }))
+{
+
+    <div class="divNetDemandPopup" style="display:none;">
+
+        @Html.Partial("_NetDemand")
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/summary" + ISSGlobals.Version)
+}
+
+<style type="text/css">
+    #clearButton {
+        float: right;
+    }
+
+    .order-header {
+        text-align: right;
+    }
+
+    .highlighted-row {
+        color: red;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        white-space: normal;
+    }
+
+    .skuBreak {
+        font-weight: bold;
+    }
+
+
+    #summaryResults .k-grid-content {
+        min-height: 100px;
+        max-height: 700px;
+    }
+
+    .contentd {
+    }
+
+    .contentd1 {
+    }
+</style>

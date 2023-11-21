@@ -1,0 +1,36 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Common;
+@using System.Web.Mvc;
+
+
+
+<div class="lb1">
+    <label> Current Allocations as of @System.DateTime.Now</label>
+</div>
+
+@(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Head Sizes")
+            .Content(@<div id="HeadDiv">   
+     @Html.Partial("_overviewHead", new System.Data.DataTable())
+                    </div>).Expanded(true);
+            panelbar.Add().Text("Dye/Bleach Mix")
+                   .Content(@<div id="DyeDiv">
+
+    @Html.Partial("_overviewDye", new System.Data.DataTable())
+</div>).Expanded(true);
+            panelbar.Add().Text("Machine Utilization")
+                       .Content(@<div id="MachineDiv">
+
+    @Html.Partial("_overviewMachine", new System.Data.DataTable())
+</div>).Expanded(true);
+            panelbar.Add().Text("Yarn")
+                   .Content(@<div id="YarnDiv">
+
+    @Html.Partial("_overviewYarn", new System.Data.DataTable())
+</div>).Expanded(true);
+
+        }))

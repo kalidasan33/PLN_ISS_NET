@@ -1,0 +1,56 @@
+﻿
+@using ISS.Core.Model.Order;
+@model SummaryFilterModal
+
+<div class="planner-section2">
+    <button class="k-button" onclick="return ISS.common.multiselectAll('CorpDiv', 'CorpDivCd')" style="font-size:10px;">Select All</button>
+    <button class="k-button" onclick="return ISS.common.multiunselectAll('CorpDiv')" style="font-size:10px;">UnSelect All</button>
+    @(Html.Kendo().MultiSelectFor(m => m.CorpDiv)
+    .Placeholder("Select Corp Division...")
+    .AutoClose(false)
+    .AutoBind(true)
+    .DataSource(source =>
+    {
+    source.Custom()
+    .ServerFiltering(false)
+    .Type("aspnetmvc-ajax")
+    .Transport(transport =>
+    {
+    transport.Read("GetCorpDivision", "Shared");
+    })
+    .Schema(schema =>
+    {
+    schema.Data("Data");
+    });
+    })
+    .Events(e =>
+    {
+    //e.Change("onPlannerClose");
+    //e.Close("onPlannerClose");
+    //e.DataBound("onPlannerDataBound");
+    })
+            .DataTextField("CorpDivDesc")
+            .DataValueField("CorpDivCd")
+    )
+    
+</div>
+
+<script>
+    $(document).ready(function () {
+
+
+    });
+    function onPlannerClose(e) {
+
+    }
+
+    function onPlannerDataBound(e) {
+
+    }
+
+</script>
+<style scoped>
+    .planner-section2 h2 {
+        font-weight: normal;
+    }
+</style>

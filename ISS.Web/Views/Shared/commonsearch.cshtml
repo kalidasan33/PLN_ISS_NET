@@ -1,0 +1,98 @@
+﻿@using ISS.Core.Model.Common;
+@using ISS.Common;
+
+@model CommonSearch
+
+@using (Html.BeginForm("CommonSearch", "shared", FormMethod.Post, new { Id = "frmCommonSearch" }))
+    {
+
+
+    <br />
+    <label id="FilteredCommonSearch" class="display-filters"></label>
+    <br />
+    
+        var grid = Html.Kendo().Grid<dynamic>
+            ().Name(((!String.IsNullOrEmpty(Model.GridName)) ? Model.GridName : "grdCommonSearch")).HtmlAttributes(new { @class = "kgridheightsmall" })
+            .Columns(
+        columns =>
+        {
+            if (Model.AllowSelect)
+            {
+                columns.Command(command => command.Custom("Select").Click("ISS.common.CommonSearchSelected")).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+            }
+
+            foreach (var item in Model.Columns)
+            {
+                var inst = columns.Bound(item.Name).Title(item.Title);
+                if (item.NeedCheckBox)
+                    inst.ClientTemplate("<input  type='checkbox'   data-bind='checked: " + item.Name + "' #= " + item.Name + " ? checked='checked' : '' #/>");
+                if (item.Width.HasValue)
+                {
+                    inst.Width(item.Width.Value);
+                }
+                if (!string.IsNullOrEmpty(item.CssClass))
+                {
+                    inst.HtmlAttributes(new { @class = item.CssClass });
+                }
+                if (!string.IsNullOrEmpty(item.Format))
+                {
+                    // inst.Format(item.Format);
+                    inst.Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+
+                }
+            }
+
+        }
+        )
+        .AutoBind(false)      
+        .Scrollable(scroll =>
+        {
+            scroll.Enabled(true);
+            scroll.Height("auto");
+        })
+        .Resizable(resizing => resizing.Columns(true))
+
+        .Sortable()
+            .Events(e => e.DataBound("ISS.common.CommonSearchDataBound"))
+        .DataSource(dataSource =>
+        {
+            var ds=dataSource
+                .Ajax()
+                .ServerOperation(false)
+                .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                .Read(read =>
+                {
+                    read.Url(Model.ReadUrl);
+                    
+
+                });
+            if(!Model.HidePager)
+             ds.PageSize(ISS.Common.LOVConstants.DefaultPageSizes);
+        }
+
+        );
+        if(!Model.HideFilter){
+         grid.Filterable(filterable => filterable
+            .Extra(false)
+            .Operators(operators => operators
+            .ForString(str => ISS.Web.Helpers.FilterHelper.FilterString(str))
+            .ForNumber(num => ISS.Web.Helpers.FilterHelper.FilterNumber(num))
+            .ForDate(dte => ISS.Web.Helpers.FilterHelper.FilterDate(dte))
+            )
+        );
+        }
+         if(!Model.HidePager){
+        grid.Pageable(conf =>
+        {
+            conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+            conf.Enabled(true);
+        });
+
+      
+         }
+
+    
+    @(grid )
+
+
+    }

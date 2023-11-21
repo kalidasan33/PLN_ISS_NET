@@ -1,0 +1,238 @@
+﻿@using ISS.Core.Model.Order;
+@model VendorSearch
+
+@using (Html.BeginForm("GetVendor", "Order", FormMethod.Post, new { Id = "frmSearchVendor" }))
+{
+    <div id="vendorSearch">
+
+        <table class="ttab">
+            <tr>
+                <td>
+                    @Html.RadioButton("vendorSearch", "byStyleAndColor", true) <label for="byStyleAndColor">By Style and Color</label>
+                </td>
+                <td>
+                    @Html.RadioButton("vendorSearch", "byVendor", false) <label for="byVendor">By Vendor Name</label>
+                </td>
+            </tr>
+            <tr class="blankrow1"></tr>
+        </table>
+
+        <div id="searchVendor">
+            <table class="ttab">
+                <tr>
+                    <td>
+                        @Html.LabelFor(m => m.VendorName)
+                    </td>
+                    <td class=""> </td>
+                </tr>
+                @*<tr class="blankrow1"></tr>*@
+                <tr>
+                    <td style="padding-top:0px !important">
+                        @Html.Kendo().TextBoxFor(r => r.ByName)
+                    </td>
+                    <td class="dspace"> </td>
+                    <td class="buttonalign">
+
+                        <div class="btnContainer floatRight searchalign">
+                            <input type="submit" value="Search" id="btnVendorSearchByName" />
+                        </div>
+                    </td>
+                    <td class="dspace"> </td>
+                    <td class="buttonalign">
+                        <div class="btnContainer floatRight">
+                            <input type="reset" value="Clear" id="btnVendorClearName" />
+                        </div>
+
+                    </td>
+
+
+                    <td></td>
+                </tr>
+                @*<tr class="blankrow1"></tr>*@
+            </table>
+            <br />
+            <label id="FilteredSearchColumnsVN" class="display-filters"></label>
+            <br/>
+            @(Html.Kendo().Grid<VendorSearch>().Name("grdVendorByName").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click("requisitions.showDetails")).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+                            columns.Bound(s => s.VendorName).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.BusUnit).Width(ISS.Common.LOVConstants.Width.Small2);
+                            columns.Bound(s => s.VendorCity).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.LwVendorCountry).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwCompany).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwVendorLoc).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwVendorNo).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorId).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorSuffix).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.SrcPlant).Width(ISS.Common.LOVConstants.Width.Small3);
+
+                        }
+                        )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        })
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                        .Filterable(filterable => filterable
+                            .Extra(false)
+                            .Operators(operators => operators
+                                .ForString(str => ISS.Web.Helpers.FilterHelper.FilterString(str))
+                                .ForNumber(num => ISS.Web.Helpers.FilterHelper.FilterNumber(num))
+                                .ForDate(dte => ISS.Web.Helpers.FilterHelper.FilterDate(dte))
+
+                            )
+                        )
+                        .Sortable()
+                        .Events(e => e.DataBound("requisitions.rowDataBoundVN"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("GetVendor", "order", new { area = "" }); 
+                                read.Data("requisitions.searchVendorDetails");
+
+                            })
+
+
+                        )
+
+            )
+
+
+
+
+
+
+
+        </div>
+        <div id="searchStyleColor">
+
+            <table class="ttab">
+                <tr>
+                    <td>
+                        @Html.LabelFor(m => m.ByStyle)
+                    </td>
+                    <td class="dspace"> </td>
+                    <td>
+                        @Html.LabelFor(m => m.ByColor)
+                    </td>
+                    <td></td>
+                </tr>
+                <tr class="blankrow1"></tr>
+                <tr>
+                    <td style="padding-top:0px !important">
+                        @Html.Kendo().TextBoxFor(r => r.ByStyle).HtmlAttributes(new { maxlength = 8, @class = "clsupper" })
+                    </td>
+                    <td class="dspace"> </td>
+                    <td style="padding-top:0px !important">
+                        @Html.Kendo().TextBoxFor(r => r.ByColor).HtmlAttributes(new { maxlength = 4, @class = "clsupper" })
+                    </td>
+                    <td class="dspace"> </td>
+
+                    <td class="buttonalign">
+
+                        <div class="btnContainer floatRight searchalign">
+                            <input type="submit" value="Search" id="btnVendorSearchByStyle" />
+                        </div>
+                    </td>
+                    <td class="dspace"> </td>
+                    <td class="buttonalign">
+                        <div class="btnContainer floatRight">
+                            <input type="reset" value="Clear" id="btnVendorClearStyle" />
+                        </div>
+
+                    </td>
+
+                    <td></td>
+                </tr>
+                <tr class="blankrow1"></tr>
+            </table>
+            <label id="FilteredSearchColumnsV" class="display-filters"></label>
+            <br/>
+            @(Html.Kendo().Grid<VendorSearch>().Name("grdVendorByStyle").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click("requisitions.showDetails")).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+                            columns.Bound(s => s.ByStyle).Width(ISS.Common.LOVConstants.Width.Style);
+                            columns.Bound(s => s.ByColor).Width(ISS.Common.LOVConstants.Width.Color);
+                            columns.Bound(s => s.BusUnit).Width(ISS.Common.LOVConstants.Width.Small2);
+                            columns.Bound(s => s.VendorName).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.VendorCity).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.LwVendorCountry).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwCompany).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwVendorNo).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.LwVendorLoc).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorId).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.VendorSuffix).Width(ISS.Common.LOVConstants.Width.Small3);
+                            columns.Bound(s => s.SrcPlant).Width(ISS.Common.LOVConstants.Width.Small3);
+                        }
+                        )
+                        .AutoBind(false)
+                        .Events(e => e.DataBound("requisitions.rowDataBoundV"))
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                        .Filterable(filterable => filterable
+                            .Extra(false)
+                            .Operators(operators => operators
+                                .ForString(str => ISS.Web.Helpers.FilterHelper.FilterString(str))
+                                .ForNumber(num => ISS.Web.Helpers.FilterHelper.FilterNumber(num))
+                                .ForDate(dte => ISS.Web.Helpers.FilterHelper.FilterDate(dte))
+
+                            )
+                        )
+                        .Sortable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("GetVendor", "order", new { area = "" });
+                                read.Data("requisitions.searchVendorDetails");
+
+                            })
+
+
+                        )
+
+
+
+            )
+
+        </div>
+
+
+
+    </div>
+}
+
+<style>
+    #vendorSearch .k-grid-content {
+        min-height: 100px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        white-space: normal;
+    }
+</style>

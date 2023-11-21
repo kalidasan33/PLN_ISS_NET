@@ -1,0 +1,93 @@
+﻿@using ISS.Core.Model.Order;
+@model Requisition
+
+@using (Html.BeginForm("RequisitionComment", "Order", FormMethod.Get, new { Id = "frmReqComments" }))
+{
+<table class="ttab boldText">
+    <tr>
+        <td class="tdlbl1"> <label>Requisition Number</label>
+            @Html.Hidden("CommentReqVersionNo")</td>
+        <td class="espace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.RequisitionId).HtmlAttributes(new { @class = "widthm1", @disabled = "disabled" })</td>
+        <td class="dspace"> </td>
+        <td class="tdlbl1"> <label>Requisition Revision</label></td>
+        <td class="espace"> </td>
+        <td>
+            <label id="lblRequisitionVersion" for="RequisitionVersion" class="reqCommentClear"></label>
+        </td>
+        <td class="dspace"> </td>
+</tr>
+<tr class="blankrow1"></tr>
+    <tr>
+        <td class="tdlbl1"> @Html.LabelFor(d => d.PlanningContact)</td>
+        <td class="espace"> </td>
+        <td><label id="lblPlanningContact" for="PlanningContact" class="reqCommentClear"></label></td>
+        <td class="dspace"> </td>
+        <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionApprover)</td>
+        <td class="espace"> </td>
+        <td><label id="lblRequisitionApprover" for="RequisitionApprover" class="reqCommentClear"></label></td>
+        <td class="dspace"> </td>
+    </tr>
+<tr class="blankrow1"></tr>
+<tr>
+    <td class="tdlbl1"><label>Planner User ID</label></td>
+    <td class="espace"> </td>
+    <td><label id="lblCreatedBy" for="CreatedBy" class="reqCommentClear"></label></td>
+    <td class="dspace"> </td>
+    <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionApproverId)</td>
+    <td class="espace"> </td>
+    <td><label id="lblRequisitionApproverId" for="RequisitionApproverId" class="reqCommentClear"></label></td>
+    <td class="dspace"> </td>
+</tr>
+<tr class="blankrow1"></tr>
+
+<tr class="blankrow1"></tr>
+<tr>
+    <td class="tdlbl1"> <label>Last Updated</label></td>
+    <td class="espace"> </td>
+    <td><label id="lblUpdatedBy" for="UpdatedBy" class="reqCommentClear"></label></td>
+    <td class="dspace"> </td>
+    <td class="tdlbl1"> <label>Last Updated</label></td>
+    <td class="espace"> </td>
+    <td><label id="lblUpdatedByAppr" for="UpdatedBy" class="reqCommentClear"></label></td>
+    <td class="dspace"> </td>
+</tr>
+<tr class="blankrow1"></tr>
+<tr>
+    <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionComment.PlannerComment)</td>
+    <td class="espace"> </td>
+    <td class="tdlbl1" colspan="5"> @Html.TextAreaFor(d => d.RequisitionComment.PlannerComment, new { id = "txtPlannerComment", @class="k-textbox", @cols="50", @rows="8" })</td>
+    
+</tr>
+    <tr class="blankrow1"></tr>
+    <tr>
+        <td class="tdlbl1"> @Html.LabelFor(d => d.RequisitionComment.ApproverComment)</td>
+        <td class="espace"> </td>
+        <td class="tdlbl1" colspan="5"> @Html.TextAreaFor(d => d.RequisitionComment.ApproverComment, new { id = "txtApproverComment", @class = "k-textbox", @cols = "50", @rows = "8" })</td>
+        
+    </tr>
+    <tr class="blankrow1"></tr>
+   <tr>
+       <td class="tdlbl1">  </td>
+       <td class="espace"> </td>
+
+       <td colspan="5">
+           <div class="btnContainer floatRight">
+               <input type="submit" value="Save" id="btnReqCommentsSave" />
+           </div>
+       </td>
+   </tr>
+</table>
+   
+}
+<style>
+    .boldText .tdlbl1 label
+    {
+        font-weight:bold;
+    }
+
+    .k-textbox
+    {
+        width:auto;
+    }
+</style>

@@ -1,0 +1,102 @@
+﻿
+@using ISS.Web.Helpers;
+@using ISS.Common;
+@model ISS.Core.Model.Order.WorkOrderTextiles
+
+
+
+
+@using (Html.BeginForm("GetFabric", "Order", FormMethod.Post, new { Id = "frmTexFab" }))
+{
+    <div>
+@(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Textiles")
+            .Content(@<div>
+    <table class="ttab">
+        <tr class="blankrow1"></tr>
+
+        <tr>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.TxtPlant)</td>
+            <td class="dspace"> </td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.MacType)</td>
+            <td class="dspace"> </td>
+
+            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Limit)</td>
+            <td class="dspace"> </td>
+            
+        </tr>
+
+        <tr class="blankrow1"></tr>
+        <tr>
+            
+           
+            <td>
+               
+                @Html.Kendo().ComboBoxFor(d => d.TxtPlant).HtmlAttributes(new { @class = "widths" }).Filter(FilterType.StartsWith).DataTextField("Text").DataValueField("Value").Events(e => e.Change("WO.filterMachineType"))
+                
+
+            </td>
+            <td class="dspace"> </td>
+            <td>
+               
+
+                @Html.Kendo().ComboBoxFor(d => d.MacType).HtmlAttributes(new { @class = "widths" }).Filter(FilterType.StartsWith).DataTextField("Text").DataValueField("Value")
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.Limit).HtmlAttributes(new { @class = "widths" })
+
+            </td>
+            <td class="dspace"> </td>
+            <td class="tdlbl1">@Html.Kendo().TextBoxFor(d => d.Variance).Enable(false).HtmlAttributes(new { @class = "widthma" })</td>
+            </tr>
+        </table>
+</div>).Expanded(true);
+        })
+)
+        
+            @(Html.Kendo().Grid<ISS.Core.Model.Order.WorkOrderFabric>().Name("grdwrkOrderFabric").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+        columns =>
+        {
+            columns.Bound(s => s.Id).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.IsHide).Width(LOVConstants.Width.Small1).Hidden();
+            columns.Bound(s => s.Merged).Width(LOVConstants.Width.Small1).Hidden();
+            columns.Bound(s => s.SizeShortDes).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.Fabric).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.CylSize).Width(LOVConstants.Width.Small2);
+            columns.Bound(s => s.SpreadCode).Width(LOVConstants.Width.Small2);
+            columns.Bound(s => s.CompCode).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.DyeCode).Width(LOVConstants.Width.Small3);
+            columns.Bound(s => s.Lbs).Width(LOVConstants.Width.Small1);
+            columns.Bound(s => s.PullFromStock).Width(LOVConstants.Width.Small2)
+                .ClientTemplate("<input  type='checkbox' class='chkPFSFab'  data-bind='checked: PullFromStock' #= PullFromStock ? checked='checked' : '' #/>");
+            //.Template(s => s.PullFromStock).ClientTemplate("<input type='checkbox' id='PullFromStock'/>");
+
+        })
+         .Events(e => e.DataBound("WO.onFabricDataBound"))
+      .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        })
+            )
+        
+            </div>
+}
+
+<style type="text/css">
+     .k-combobox input {
+        text-transform: uppercase;
+    }
+    
+    .k-grid-content {
+        min-height: 100px;
+    }
+
+    
+</style>

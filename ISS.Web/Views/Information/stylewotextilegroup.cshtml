@@ -1,0 +1,142 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Information.StyleSearch
+@{
+    ViewBag.Title = "Style W/O Textile Group";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docWOTextileGroupReady();
+    });
+</script>
+ 
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmWOTextileGroup" }))
+{
+    <div class="expand form1 planForm1  width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.LabelFor(d => d.StyleCode)</td>
+                            <td class="dspace"> </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.StyleCode)
+
+                            </td>
+                            <td class="buttonalign">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="btnWOTextileGroupSearch" />
+
+                                </div>
+                            </td>
+
+                            <td  class="buttonalign">
+                                <div class="btnContainer floatRight">
+
+                                    <input type="reset" value="Clear" id="btnWOTextileGroupClear" />
+                                </div>
+                            </td>
+                           
+                        </tr>
+                        <tr class="blankrow1"></tr>
+
+                        
+                   
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                          <label id="FilteredColumns" class="display-filters"></label>
+                          @*<div class="btnContainer floatRight">
+                              <input type="submit" id="btnWOTextileGroupExport" class="excel_btn" />
+
+                          </div>
+                          <br /><br />*@
+                    @(Html.Kendo().Grid<WOTextileGroup>().Name("grdWOTextileGroup").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.TextileGroup).Width(LOVConstants.Width.Large2);
+                    columns.Bound(p => p.Reason);
+                    columns.Bound(p => p.UserId).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.CreatedDate).Width(LOVConstants.Width.Medium3).Format("{0:" + LOVConstants.DateFormatDisplay + "}"); ;
+                    columns.Bound(p => p.UpdatedDate).Width(LOVConstants.Width.Medium3).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+
+
+                }
+                )
+
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                            .ForDate(dte =>FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+                                .ToolBar(toolbar =>
+                                                                                        {
+                                                                                            toolbar.Excel();
+                                                                                        })
+                                                                                        .Excel(excel => excel
+                                                                                            .FileName("StyleWOTextileGroup" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                                                            .Filterable(true)
+                                                                                            .AllPages(true)
+                                                                                         )
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("StyleWOTextileGroup", "Information");
+                        read.Data("information.searchDataWOTextileGroup");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>

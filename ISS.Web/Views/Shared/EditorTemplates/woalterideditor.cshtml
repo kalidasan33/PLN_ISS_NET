@@ -1,0 +1,18 @@
+﻿@*@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("WOMgetAlternateId", "Order").Type(HttpVerbs.Post).Data("WO.MFGFilterData");
+      }).ServerFiltering(false);
+  })
+ .DataValueField("CuttingAlt")
+ .DataTextField("CuttingAlt")
+            .Events(e =>
+            {
+                e.Change("WO.AlterIdChange");
+            })
+)*@
+@model string
+<input type="text" id="AlternateId" name="AlternateId" class="k-textbox" ondblclick="WO.showAlterpopupId(this);" onchange="    WO.AlterIdChange(this);" style="text-transform:uppercase" />
+@*onkeypress="WO.validationPurOrder(this);"*@

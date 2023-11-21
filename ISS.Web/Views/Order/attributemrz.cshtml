@@ -1,0 +1,152 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Order.AttributionMrz
+@{
+    ViewBag.Title = "Attribute MRZ";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/amrz" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        amrz.docAttriMrzReady();
+    });
+</script>
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmAttributeMrz" }))
+{
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.LabelFor(d => d.OrderId)</td>
+                            <td class="dspace"> </td>
+                            <td> @Html.LabelFor(d => d.Style)</td>
+                            <td class="dspace"> </td>
+                            <td> @Html.LabelFor(d => d.Color)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.Attribute)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.Size)</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.OrderId).HtmlAttributes(new { @class = "widthm1 clsupper" })
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.Style).HtmlAttributes(new { @class = "widthm1 clsupper" })
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.Color).HtmlAttributes(new { @class = "widthm1 clsupper" })
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Attribute).HtmlAttributes(new { @class = "widthm1 clsupper" })</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Size).HtmlAttributes(new { @class = "widthm1 clsupper" })</td>
+                            <td class="dspace"> </td>
+                            <td><input type="submit" value="Search" id="btnAttributeMrzSearch" /></td>
+                            <td><input type="reset" value="Clear" id="btnAttributeMrzClear" /></td>
+                        </tr>
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                    <label id="FilteredColumns" class="display-filters"></label>
+                    @*<div class="btnContainer floatRight">
+                            <input type="submit" id="btnDCWorkOrdersExport" class="excel_btn" />
+                        </div>
+                        <br /><br />*@
+                    @(Html.Kendo().Grid<ISS.Core.Model.Order.AttributionMrz>().Name("grdAttriMrz").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Template(t => t.GridMode).ClientTemplate("<input type='checkbox' class ='chckbx'/>").HeaderTemplate("<label><center>All</center></label><input type='checkbox' class='chkbxHeader' Id='SelectAll'/>").Width(30);
+                    //columns.Template(p => p.GridMode).ClientTemplate("<input type='checkbox' class='chkbx'  />").HeaderTemplate("Select").Width(50);
+                    //columns.Command(command => command.Custom("DeleteItem").Text(" ").Click("amrz.deleteAttriMrz")).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.OrderId).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.OrderVersion).Width(LOVConstants.Width.Small3); 
+                    columns.Bound(p => p.SuperOrder).Width(LOVConstants.Width.Medium1); ;
+                    columns.Bound(p => p.Style).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.Color).Width(LOVConstants.Width.Style);
+                    columns.Bound(p => p.Attribute).Width(LOVConstants.Width.Color);
+                    columns.Bound(p => p.Size).Width(LOVConstants.Width.Size);
+                    columns.Bound(p => p.MfgPathId).Width(LOVConstants.Width.Medium1); 
+                    columns.Bound(p => p.CurrQty).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.TotalQty).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.CurrDueDate).Width(LOVConstants.Width.Medium1).Format("{0:" + LOVConstants.DateFormatDisplay + "}"); 
+
+                }
+                )
+
+                .AutoBind(false)
+                         .ToolBar(toolbar =>
+                         {
+                             //toolbar.Excel();
+                             toolbar.Custom().Name("btndeleteAttributeMrz").Text("Delete");
+                             
+                            })
+                         .Excel(excel => excel
+                             .FileName("AttributeMrz" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                             .Filterable(true)
+                             .AllPages(true)
+                          )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                                                .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                            .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                .Sortable().Events(ev => ev.DataBound("amrz.gridAttriMrzDataBound"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("AttributeMrz", "Order");
+                        read.Data("amrz.searchAttributeMrzOrders");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>

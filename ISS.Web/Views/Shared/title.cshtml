@@ -1,0 +1,23 @@
+﻿@using ISS.Web.Helpers;
+
+@model  KeyValuePair<string, string>
+
+@if ( SessionHelper.OutputMessage != null)
+{
+    <div class="messegealert-info">@Html.Raw( SessionHelper.OutputMessage.ToString()) </div>
+
+    <br />
+    
+    SessionHelper.OutputMessage = null;
+
+    <script>
+        $(document).ready(function () {
+            setTimeout('$(".messegealert-info").hide("slow")',10000)
+        });
+
+    </script>
+}
+ 
+<h1 class="contentTitle">@Model.Value</h1>
+<div class="clear"></div>
+

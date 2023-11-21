@@ -1,0 +1,165 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+<table class="">
+    
+    @*<tr>
+        <td class="buttonalign">
+            <div class="btnContainer floatRight">
+                <input type="submit" value="Select All"  id="btnRetOrderSelectAll" />
+
+            </div>
+        </td>
+        <td class="buttonalign">
+            <div class="btnContainer floatRight">
+                <input type="submit" value="Move to Detail" id="btnRetOrderMove" />
+
+            </div>
+        </td>
+        <td class="buttonalign">
+            <div class="btnContainer floatRight">
+                <input type="submit" value="Move All" id="btnRetOrderMoveAll" />
+
+            </div>
+        </td>
+        <td class="buttonalign">
+            <div class="btnContainer floatRight">
+                <input type="submit" data-url="@Url.Action("summary","order")" value="Jump To Summary" id="btnRetOrderJump" />
+
+            </div>
+        </td>*@
+    <tr>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td style="color:blue;vertical-align:middle;"> <label>Total Dz : </label> <label id="lblFRetTot"> 0</label></td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+        <td style="color:blue;vertical-align: middle;"> <label>Total Row(s) Selected : </label> <label id="lblRowSelTot"> 0</label></td>
+
+        
+       
+      
+        
+        <td class="dspace"></td>
+       
+    </tr>
+    <tr class="blankrow1"></tr>
+
+
+
+</table>
+<label id="FilteredColumns" class="display-filters"></label>
+@(Html.Kendo().Grid<RequisitionOrder>().Name("grdRetOrder").HtmlAttributes(new  { @class="kgridheight"}).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.VendorNo).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.VendorLoc).Width(LOVConstants.Width.Medium1);
+
+                    columns.Bound(p => p.Style).Width(LOVConstants.Width.Style);
+                    columns.Bound(p => p.Color).Width(LOVConstants.Width.Color);
+                    columns.Bound(p => p.Attribute).Width(LOVConstants.Width.Attribute);
+                    columns.Bound(p => p.Size).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeLit).Width(LOVConstants.Width.Size);
+
+                    columns.Bound(p => p.Rev).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.UOM).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Qty).Width(LOVConstants.Width.Small3).HtmlAttributes(new { @class = "ob-right retOrdQty" });
+                    columns.Bound(p => p.SewPlant).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Dc).Width(LOVConstants.Width.Small3);
+
+                    columns.Bound(p => p.SewDate).Width(LOVConstants.Width.Medium1).Format("{0:" + LOVConstants.DateFormatDisplay + "}"); ;
+                    columns.Bound(p => p.DcDate).Width(LOVConstants.Width.Medium1).Format("{0:" + LOVConstants.DateFormatDisplay + "}"); ;
+                    columns.Bound(p => p.Enforcement).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.RuleNo).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.RuleDescription).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.Priority).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(p => p.SuperOrder).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(p => p.S).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(p => p.T).Width(LOVConstants.Width.Small3);
+
+                    //columns.Bound(p => p.V).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(p => p.W).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(p => p.X).Width(LOVConstants.Width.Small3);  
+                }
+                )
+                        .ToolBar(toolbar =>
+                        {
+                            bool? resDup = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.SOURCED_ORDER);
+                            if (resDup.HasValue && resDup.Value)
+                            {
+                                toolbar.Custom().Text("Select All").Name("btnRetOrderSelectAll");
+                                toolbar.Custom().Text("Move To Detail").Name("btnRetOrderMove");
+                                toolbar.Custom().Text("Move All").Name("btnRetOrderMoveAll");
+                                toolbar.Custom().Text("Jump To Summary").Name("btnRetOrderJump").HtmlAttributes(new { @data_url = @Url.Action("summary", "order") });
+
+
+
+
+                            }
+                        }
+                    )
+                .Selectable(sel =>
+                    {
+                        sel.Mode(GridSelectionMode.Multiple).Type(GridSelectionType.Row);
+                    })
+                .Navigatable(navigation => navigation.Enabled(true))
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                .Filterable(filterable => filterable
+                        .Extra(false)
+                        .Operators(operators => operators
+                            .ForString(str => FilterHelper.FilterString(str))
+                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                        .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                        )
+                        )
+            .Sortable().Events(ev => ev.DataBound("requisitions.gridDataBoundStyle").Change("requisitions.selectRowRetOrder"))
+
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(LOVConstants.DefaultPageSizes)
+                .Read(read =>
+                {
+                    read.Action("RetrieveOrder", "Order");
+                    read.Data("requisitions.searchDataRetOrder");
+                })
+
+
+
+                )
+)
+
+
+<style> 
+#ReqOrderRetieiveDetail .k-grid-content {
+        min-height:100px;
+    }
+
+/*.k-panelbar>.k-item>.k-link { 
+  background-color: #fff !important;
+}
+.k-panelbar .k-state-focused.k-state-selected, td.k-state-focused.k-state-selected, .k-state-selected td.k-state-focused, .k-listview > .k-state-focused.k-state-selected {
+    -webkit-box-shadow: inset 0 0 7px 0 #67afe9 !important;
+    box-shadow: inset 0 0 7px 0 #67afe9 !important;
+}*/
+</style>

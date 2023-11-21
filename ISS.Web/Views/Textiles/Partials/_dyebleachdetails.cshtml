@@ -1,0 +1,77 @@
+﻿@using ISS.Core.Model.Textiles;
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Common;
+
+@model  System.Data.DataTable
+@*<div class="btnContainer floatRight">
+    <input type="submit" id="btnDyeAllocationExport" class="excel_btn" name="gridValue" value="dyealloc" />
+</div>
+<br /><br />*@
+@(Html.Kendo().Grid(Model)
+                  .Name("grdDyeBleach").HtmlAttributes(new { @class = "kgridheight" })
+              .Columns(columns =>
+               {
+                   foreach (System.Data.DataColumn column in Model.Columns)
+                   {
+                       var c = columns.Bound(column.DataType, column.ColumnName).Width(LOVConstants.Width.Medium3);
+                      
+                       switch (column.ColumnName.ToLower())
+                       {
+                           case "dye":
+                               c.Title(string.Empty);
+                               break;
+                           case "b":
+                               c.Title("Bleach");
+                               c.HtmlAttributes(new { @class = "ob-right" });
+                               break;
+                           case "d":
+                               c.Title("Dye");
+                               c.HtmlAttributes(new { @class = "ob-right" });
+                               break;
+                       }
+
+                       if (column.ColumnName == "Total")
+                       {
+                           c.HtmlAttributes(new { @class = "ob-right" });
+                       }
+
+                       if ((column.ColumnName != "Dye" && column.ColumnName != "Plant" && column.ColumnName != "Total"))
+                       {
+                           c.ClientTemplate("<a data-dye=" + column.ColumnName + " class='linki2 lnkTextiles'  href='javascript:void(0)' > #if (" + (column.ColumnName) + " == null) {# #=''# #} else {# #=" + (column.ColumnName) + "# #}# </a>");
+                           //c.ClientTemplate("<a class='linki2 lnkTextiles'  href='javascript:void(0)' > #=" + (column.ColumnName) + "# </a>");
+                       }
+
+                   }
+               }
+                    )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                })
+                    .ToolBar(toolbar =>
+                                  {
+                                      toolbar.Excel();
+                                  })
+                        .Excel(excel => excel
+                                       .FileName("TextileDyeBleachAllocations" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                       .Filterable(true)
+                                       .AllPages(true)
+                               )
+                .Resizable(resizing => resizing.Columns(true))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .Model(model =>
+                            {
+                                foreach (System.Data.DataColumn column in Model.Columns)
+                                {
+                                    model.Field(column.ColumnName, column.DataType);
+                                }
+                            })
+                    .ServerOperation(false)                    
+                    
+                )
+                    .Events(ev => ev.DataBound("textiles.onTextileGridDataBound").ExcelExport("textiles.exportDyeBleachkendo"))
+                     
+)

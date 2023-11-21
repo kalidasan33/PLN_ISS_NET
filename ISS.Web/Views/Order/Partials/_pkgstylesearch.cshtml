@@ -1,0 +1,42 @@
+﻿@using ISS.Core.Model.Order;
+@model WorkOrderDetail
+<title> Select a revision </title>
+@using (Html.BeginForm("GetRevDetails", "Order", FormMethod.Post, new { Id = "frmrevDetails" }))
+{
+    @(Html.Kendo().Grid<WorkOrderDetail>().Name("grdStyleDetails").HtmlAttributes(new { @class = "kgridheightsmall" }).Columns(
+                        columns =>
+                        {
+                            columns.Command(command => command.Custom("Select").Click("WOM.showPStyleDetails")).Width(ISS.Common.LOVConstants.Width.Medium1).Title("Select");
+                            columns.Bound(s => s.PKGStyle).Width(ISS.Common.LOVConstants.Width.Medium3);
+                            columns.Bound(s => s.ColorCode).Width(ISS.Common.LOVConstants.Width.Style).Title("Color");
+                            columns.Bound(s => s.Attribute).Width(ISS.Common.LOVConstants.Width.Small2);
+                            columns.Bound(s => s.SizeShortDes).Width(ISS.Common.LOVConstants.Width.Small2).Title("Size");
+                            columns.Bound(s => s.NewRevision).Width(ISS.Common.LOVConstants.Width.Small2);
+                            columns.Bound(s => s.RevDescription).Width(ISS.Common.LOVConstants.Width.Medium3);
+                        }
+                        )
+                        .AutoBind(false)
+                        .Scrollable(scroll =>
+                            {
+                                scroll.Enabled(true);
+                                scroll.Height("auto");
+                            })
+                        .Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                            {
+                                conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                                conf.Enabled(true);
+                            })
+                                .Events(e => e.DataBound("ISS.common.dataBoungGrid"))
+                        .Sortable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            .Read(read =>
+                            {
+                                read.Action("GetRevDetails", "order", new { area = "" });
+                                read.Data("WOM.RevisionFilterData");
+                            })
+                        )
+
+    )
+}

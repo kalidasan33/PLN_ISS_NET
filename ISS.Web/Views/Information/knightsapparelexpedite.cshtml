@@ -1,0 +1,148 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Information.KnightsApparelExpedite
+@{
+    ViewBag.Title = "Knights Apparel Expedite";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docKnightsApparelExpediteReady();
+    });
+</script>
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmKnightsApparelExpedite" }))
+{
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.LabelFor(d => d.FromDate)</td>
+                            <td> @Html.LabelFor(d => d.ToDate)</td>
+                            <td> @Html.LabelFor(d => d.StyleCode)</td>
+                            <td>@Html.LabelFor(d => d.ColorCode)</td>
+                            <td>@Html.LabelFor(d => d.AttributeCode)</td>
+                            <td>@Html.LabelFor(d => d.SizeShortDesc)</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().DatePickerFor(d => d.FromDate)
+                            </td>
+                            <td>
+                                @Html.Kendo().DatePickerFor(d => d.ToDate)
+                            </td>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.StyleCode)
+
+                            </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.ColorCode)</td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.AttributeCode)</td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.SizeCode)</td>
+                            <td><input type="button" value="Search" id="btnKnightsApparelExpediteSearch" /></td>
+                        </tr>
+
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                    <label id="FilteredColumns" class="display-filters"></label>
+                    @*<div class="btnContainer floatRight">
+                        <input type="submit" id="btnKnightsApparelExpediteExport" class="excel_btn" />
+
+                    </div>
+
+                    <br /><br />*@
+
+                    @(Html.Kendo().Grid<KnightsApparelExpedite>().Name("grdKnightsApparelExpedite").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.BulkNumber).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.StyleCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.ColorCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.AttributeCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeCode).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.DemandDate).Width(LOVConstants.Width.Small3).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.GrossRequirement).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.NetDemandRequirement).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.InTransitToDC).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.Packing).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.IssuedToWIP).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.OnSite).Width(LOVConstants.Width.Small2);
+                    //columns.Bound(p => p.PlannedButNotPicked).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.NotPlanned).Width(LOVConstants.Width.Small2);
+                }
+                )
+                        .ToolBar(toolbar =>
+                                  {
+                                      toolbar.Excel();
+                                  })
+                        .Excel(excel => excel
+                                       .FileName("KnightsApparelExpedite" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                       .Filterable(true)
+                                       .AllPages(true)
+                               )
+                .AutoBind(false)
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                        .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                            .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("KnightsApparelExpedite", "Information");
+                        read.Data("information.DataKnightsApparelExpedite");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>
+
+
+

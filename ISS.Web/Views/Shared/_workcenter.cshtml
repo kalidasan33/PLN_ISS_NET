@@ -1,0 +1,62 @@
+﻿@using ISS.Core.Model.Order;
+@model SummaryFilterModal
+
+<div class="planner-section1">
+    <button class="k-button" onclick="return ISS.common.multiselectAll('WorkCenter', 'WorkCenter_Cd')" style="font-size:10px;">Select All</button>
+    <button class="k-button" onclick="return ISS.common.multiunselectAll('WorkCenter')" style="font-size:10px;">UnSelect All</button>
+    @(Html.Kendo().MultiSelectFor(m=>m.WorkCenter)
+            .Placeholder("Select Work Center...")
+            .AutoBind(true)
+            .AutoClose(false )
+             .DataSource(source =>
+              {
+                  source.Read(read =>
+                  {
+                     // read.Action("GetWorkCenter", "Shared", new {area="" }) //Set the Action and Controller name
+                      read.Action((ViewBag.WorkCenter == null) ? "GetWorkCenter" : ViewBag.WorkCenter, "Shared", new { area = "" })
+                      .Data("onCapacityGrpData");
+                  });
+                  source.ServerFiltering(false);
+              })
+              .DataTextField("WorkCenter_Cd")
+              .DataValueField("WorkCenter_Cd")
+)
+    
+</div>
+
+<script>
+    $(document).ready(function () {
+        var required = $("#workCenterList").data("kendoMultiSelect"); 
+    });
+
+  
+    function onCapacityGrpData() {
+        var multiSelect = $('#WorkCenter').data("kendoMultiSelect");
+        multiSelect.value([]);
+        var plannr = $("#Planner").data("kendoMultiSelect");
+        var id = plannr.value().toString();
+        var cap = $("#CapacityGroup").data("kendoMultiSelect")
+        var str = "";
+
+        if (cap) 
+            str = cap.value().toString();
+        else
+        {
+            str = $("#CapacityGroup").val()
+        }
+
+        var SummaryView = {
+            Planner: id, CapacityGroup: str
+        }
+        return SummaryView;
+    }
+</script>
+<style scoped>
+    
+        .planner-section1 h2 {
+            font-weight: normal;
+        }
+
+       
+       
+</style>

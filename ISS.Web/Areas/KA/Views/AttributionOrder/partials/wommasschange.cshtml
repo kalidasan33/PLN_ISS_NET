@@ -1,0 +1,121 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.WOMMassChange
+
+@using (Html.BeginForm("WOManagementMassChange", "Order", FormMethod.Post, new { Id = "frmWOMMassChange" }))
+{
+<table class="ttab">
+    <tr>
+        <td>@Html.LabelFor(d => d.MfgPathId,"Attribute Path")</td>
+        <td class="tspace"> </td>
+        <td>@Html.CustomLabelFor(d => d.MDueDate, "datefor")</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.DC)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.QtyEach)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.OrderStatusMC)</td>
+        <td class="tspace"> </td>
+        <td> @Html.CustomLabelFor(d => d.Priority)</td>
+        <td class=""> </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.MfgPathId).HtmlAttributes(new { @class = "clsupper widths" })
+            @(Html.Kendo().Button()
+                                            .Name("btnSewPathSearch")
+                                            .Tag("em")
+                                            .SpriteCssClass("k-icon k-i-search")
+                                            .Content("<span class='k-sprite'>Cut Path</span>")
+            )
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().DatePickerFor(d => d.MDueDate).HtmlAttributes(new { placeholder = "MM/DD/YYYY", @class = "widthm1" }) </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.DC).HtmlAttributes(new { @class = "clsupper widths" })</td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.QtyEach).HtmlAttributes(new { }).HtmlAttributes(new { @maxlength = "8", @class = " widths DozenEaches" })</td>
+        <td class="tspace"> </td>
+        <td>
+            @{
+    var listOrderStatus = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Suggested.ToString(),
+                                    Value =ProductionStatus.Suggested.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Locked.ToString(),
+                                    Value =ProductionStatus.Locked.GetDescription()
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = ProductionStatus.Released.ToString(),
+                                    Value =ProductionStatus.Released.GetDescription()
+                                } ,
+                                
+
+                            };
+            }
+            @(Html.Kendo().DropDownListFor(model => model.OrderStatusMC)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                        .BindTo(listOrderStatus)
+            .HtmlAttributes(new { @class = "widthm" })
+             .OptionLabel("--Select--")             
+
+            )
+        </td>
+        <td class="tspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Priority).HtmlAttributes(new { @class = "IntField widths" })</td>
+        <td class="tspace"> </td>
+        <td colspan="6">
+            <div class="btnContainer floatLeft">
+                @{bool? resUpdate = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.WO_UPDATE_SAVE);}
+                @if ((resUpdate.HasValue && resUpdate.Value))
+                {
+                    <input type="submit" value="Mass Change" id="btnWOMMassChange" />
+                }
+            </div>
+            <div class="btnContainer floatLeft">
+
+                <input type="reset" value="Clear" id="btnWOMMassClear" />
+            </div>
+
+        </td>
+
+    </tr>
+    <tr class="blankrow1"></tr>
+    
+    
+
+    <tr>
+        <td>
+        </td>
+        <td class="tspace"> </td>
+        <td>
+            
+        </td>
+        <td colspan="2">
+           
+        </td>
+       
+        <td class="tspace"> </td>
+        <td class=""> </td><td class=""> </td>
+       
+    </tr>
+    
+    <tr>
+        <td colspan="8">
+          
+        </td>
+       
+    </tr>
+    <tr class="blankrow1"></tr>
+</table>
+}

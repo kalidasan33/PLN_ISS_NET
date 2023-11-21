@@ -1,0 +1,6 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@(
+ Html.Kendo().TextBoxFor(m => m).HtmlAttributes(new { @onfocusout = "WOM.SellingSValidate()", @ondblclick = "WOM.StyleSearchClick(this)"  })
+)
+

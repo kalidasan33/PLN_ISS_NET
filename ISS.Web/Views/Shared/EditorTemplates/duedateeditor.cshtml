@@ -1,0 +1,5 @@
+﻿@model DateTime?
+@(Html.Kendo().DatePickerFor(m => m)
+      .Format("MM/dd/yyyy")
+          .Events(e => e.Change("WOM.DCDueDateGroupChange"))
+)

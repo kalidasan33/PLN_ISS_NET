@@ -1,0 +1,481 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+@model ISS.Core.Model.Order.WOManagementSearch
+
+@using (Html.BeginForm("WOManagement", "Order", FormMethod.Post, new { Id = "frmWOMSearch" }))
+{
+ 
+    <script>
+       @if (!String.IsNullOrEmpty(Model.BusinessUnit) && Model.BusinessUnit.Split(',').Length>1)
+       {
+         <text>  var buAr='@Model.BusinessUnit' </text>
+       }
+    </script>
+    
+    @Html.HiddenFor(m=> m.SuperOrder)
+    
+       <table class="ttab">
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td>@Html.CustomLabelFor(d => d.Planner)</td>
+            <td class="tspace"> </td>
+            <td>
+                
+                @{
+                var listSellType = new List<SelectListItem>(){                            
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.StyleType.SellingStyle,
+                                    Value =LOVConstants.StyleType.SellingStyle
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.StyleType.MfgStyle,
+                                    Value =LOVConstants.StyleType.MfgStyle
+                                }  
+                            };
+                }
+                @(Html.Kendo().DropDownListFor(model => model.StyleType)
+                .DataTextField("Text")
+                .DataValueField("Value")
+                .BindTo(listSellType)
+.HtmlAttributes(new { @class = "widthma" })
+                .Value(LOVConstants.StyleType.SellingStyle)
+                )
+
+
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.SColor)</td>
+            <td class="tspace"> </td>
+
+            <td> @Html.CustomLabelFor(d => d.SAttribute)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.SSize)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.DC)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.Rev)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.CapacityGroup)</td>
+            <td class="tspace"> </td>
+            <td colspan="2"> @Html.CustomLabelFor(d => d.WorkCenter)</td>
+            
+
+        </tr>
+        <tr>
+
+
+            <td>
+                <button class="k-button" onclick="return ISS.common.multiselectAll('Planner', 'PlannerCd')" style="font-size:10px;">Select All</button>
+                <button class="k-button" onclick="return ISS.common.multiunselectAll('Planner')" style="font-size:10px;">UnSelect All</button>
+                @(Html.Kendo().MultiSelectFor(m => m.Planner).Placeholder("Select Planner...")
+                                                  .Filter(FilterType.StartsWith)
+                                                  .AutoClose(false)
+                                                 
+                                                      .DataTextField("PlannerCd")
+                                                              .DataValueField("PlannerCd")
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                    .ServerFiltering(false)
+                                                                    .Type("aspnetmvc-ajax")
+                                                                    .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetPlanners", "Order");
+                                                                    })
+                                                                    .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        })
+                )
+                @*<button class="k-button" onclick="return ISS.common.multiselectAll('Planner', 'PlannerCd')" style="font-size:10px;">Select All</button>
+                <button class="k-button" onclick="return ISS.common.multiunselectAll('Planner')" style="font-size:10px;">UnSelect All</button>*@
+            </td>
+            <td class="tspace"> </td>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.SStyle).HtmlAttributes(new { @class = " widthm" })
+                @*@Html.Kendo().TextBoxFor(d => d.MfgStyle).HtmlAttributes(new { @class = "" })*@
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.SColor).HtmlAttributes(new { @class = " widths" })
+                @*@Html.Kendo().TextBoxFor(d => d.MfgStyle).HtmlAttributes(new { @class = "" })*@
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.SAttribute).HtmlAttributes(new { @class = " widths" })
+                @*@Html.Kendo().TextBoxFor(d => d.MfgStyle).HtmlAttributes(new { @class = "" })*@
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.SSize).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.DC).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Rev).HtmlAttributes(new { @class = " widths IntField" })</td>
+
+            <td class="tspace"> </td>
+            <td>
+               @(Html.Kendo().MultiSelectFor(m => m.CapacityGroup)
+                .DataTextField("PlannerCd")
+                .DataValueField("PlannerCd")
+                .AutoClose(false)
+                .Events(e => e.Change("WOM.OnCapacityChange"))
+                .HtmlAttributes(new { @class = "widths" })
+                .Placeholder("Select Capacity...")
+                .DataSource(source =>
+                {
+                    source.Custom()
+                    .ServerFiltering(false)
+                    .Type("aspnetmvc-ajax")
+                    .Transport(transport =>
+                    {
+                        transport.Read("GetCapacityGroup", "Order");
+                    })
+                    .Schema(schema =>
+                    {
+                        schema.Data("Data");
+                    });
+                })
+            )
+
+            </td>
+            <td class="tspace"> </td>
+            <td width="100px"> @Html.Partial("_WorkCenter", new SummaryFilterModal())</td>
+            @*<td class=""> </td>*@
+       
+        </tr>
+
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td> @Html.CustomLabelFor(d => d.MfgPathId)</td>
+                        <td class="tspace"> &nbsp;&nbsp;&nbsp;&nbsp; </td>
+                        <td> @Html.CustomLabelFor(d => d.Rule)</td>
+                    </tr>
+                </table>
+            </td>
+            <td class="tspace">  </td>
+            <td> @Html.CustomLabelFor(d => d.GroupId)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.MFGPlant)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.CylinderSize)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.DyeBle)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.TextileGroup)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.Alt)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.Machine)</td>
+            <td class="tspace"> </td>
+            <td colspan="2">
+                <table>
+                    <tr>
+                        <td> @Html.CustomLabelFor(d => d.Yarn)</td>
+                        <td class="tspace">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
+                        <td> @Html.CustomLabelFor(d => d.DueDate)</td>
+                        <td class="tspace"> </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>@Html.Kendo().TextBoxFor(d => d.MfgPathId).HtmlAttributes(new { @class = " widths" })</td>
+                        <td class="tspace"> </td>
+                        <td>@Html.Kendo().TextBoxFor(d => d.Rule).HtmlAttributes(new { @class = " widths IntField" })</td>
+                    </tr>
+                </table>
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.GroupId).HtmlAttributes(new { @class = " widths IntField" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.MFGPlant).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.CylinderSize).HtmlAttributes(new { @class = "excludeF widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.DyeBle).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.TextileGroup).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Alt).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Machine).HtmlAttributes(new { @class = " widths" })</td>
+            <td class="tspace"> </td>
+            <td colspan="2">
+                <table>
+                    <tr>
+                        <td>@Html.Kendo().TextBoxFor(d => d.Yarn).HtmlAttributes(new { @class = " widths" })</td>
+                        <td class="tspace"> </td>
+                        <td>
+                            @{
+    var listDueDate = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.BD,
+                                    Value =LOVConstants.WOMDueDates.BD
+                                } , 
+                             new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.Cut,
+                                    Value =LOVConstants.WOMDueDates.Cut
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.Sew,
+                                    Value =LOVConstants.WOMDueDates.Sew
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.Atr,
+                                    Value =LOVConstants.WOMDueDates.Atr
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.DC,
+                                    Value =LOVConstants.WOMDueDates.DC
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMDueDates.EarliestStart,
+                                    Value =LOVConstants.WOMDueDates.EarliestStart
+                                } ,
+                            };
+                            }
+                            @(Html.Kendo().DropDownListFor(model => model.DueDate)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                    .BindTo(listDueDate)
+            .HtmlAttributes(new { @class = "widths" })
+                    .Value(LOVConstants.WOMDueDates.EarliestStart)
+
+                            )
+
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td> @Html.CustomLabelFor(d => d.Week)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.MoreWeeks)</td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.BusinessUnit)</td>
+            <td class="tspace"> </td>
+            <td class="tspace"> </td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.CorpDiv)</td>
+            <td class="tspace"> </td>
+            <td> </td>
+            <td> </td>
+            <td> </td>
+            <td class="tspace"> </td>
+            <td> @Html.CustomLabelFor(d => d.Fabric)</td>
+
+
+
+        </tr>
+
+
+        <tr>
+            <td>
+                @{
+    var listWeeks = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMWeeks.CurrentPriorWeek,
+                                    Value =LOVConstants.WOMWeeks.CurrentPriorWeek
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMWeeks.PlanWeekOne,
+                                    Value =LOVConstants.WOMWeeks.PlanWeekOne
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMWeeks.PlanWeekTwo,
+                                    Value =LOVConstants.WOMWeeks.PlanWeekTwo
+                                } ,
+                                 new SelectListItem()
+                                {
+                                    Text = LOVConstants.WOMWeeks.PlanWeekThree,
+                                    Value =LOVConstants.WOMWeeks.PlanWeekThree
+                                } ,
+
+                            };
+                }
+                @(Html.Kendo().ComboBoxFor(model => model.Week)
+            .DataTextField("Text")
+            .DataValueField("Value")
+                            .BindTo(listWeeks)
+            .HtmlAttributes(new { @class = "widthmww" })
+                            .Value(LOVConstants.WOMWeeks.CurrentPriorWeek)
+
+                )
+
+            </td>
+            <td class="tspace"> </td>
+            <td>
+                @{
+    var list = new List<SelectListItem>();
+    for (int i = 0; i < 53; i++)
+    {
+        list.Add(new SelectListItem()
+        {
+            Text = i.ToString(),
+            Value = i.ToString()
+        });
+    }
+                }
+                @(Html.Kendo().ComboBoxFor(model => model.MoreWeeks)
+            .DataTextField("Text")
+            .DataValueField("Value")
+            .BindTo(list)
+            .HtmlAttributes(new { @class = "widths" })
+            .Value("52")
+
+                )
+
+            </td>
+            <td class="tspace"> </td>
+            <td colspan="3">
+                <button class="k-button" onclick="return ISS.common.multiselectAll('BusinessUnit', 'BusinessUnit')" style="font-size:10px;">Select All</button>
+                <button class="k-button" onclick="return ISS.common.multiunselectAll('BusinessUnit')" style="font-size:10px;">UnSelect All</button>
+                @(Html.Kendo().MultiSelectFor(d => d.BusinessUnit)
+         .Placeholder("All")
+                     
+            .DataSource(source =>
+            {
+                source.Custom()
+                        .ServerFiltering(false)
+                        .Type("aspnetmvc-ajax")
+                        .Transport(transport =>
+                        {
+                            transport.Read("GetBusinessContact", "Shared");
+                        })
+                        .Schema(schema =>
+                        {
+                            schema.Data("Data");
+                        });
+            })
+            .DataTextField("BusinessUnit")
+            .DataValueField("BusinessUnit")
+    
+            //.Value(String.IsNullOrEmpty(Model.BusinessUnit) ? null : Model.BusinessUnit.Split(','))        
+
+                )
+                @*<button class="k-button" onclick="return ISS.common.multiselectAll('BusinessUnit', 'BusinessUnit')" style="font-size:10px;">Select All</button>
+                <button class="k-button" onclick="return ISS.common.multiunselectAll('BusinessUnit')" style="font-size:10px;">UnSelect All</button>*@
+            </td>
+            <td class="tspace"> </td>
+            <td colspan="2">
+                <div id="partialPlaceCorp" style="width:160px;   height: 20px;">
+                    @Html.Partial("_CorpDivision", new SummaryFilterModal())
+                </div>
+               
+            <td colspan="3">
+                @Html.CheckBoxFor(d => d.BOMMismatches) @Html.CustomLabelFor(d => d.BOMMismatches)
+            </td>
+            <td class="tspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Fabric).HtmlAttributes(new { @class = " widths" })</td>
+            
+            @*<td class="Filters "><a class="linki2" id="filtergrid1" href="javascript:void(0)"> Filter Grid</a> </td>*@
+            <td class="tspace"> </td>
+            <td colspan="5">
+                <div class="btnContainer floatLeft">
+                    <input type="submit" value="Search" id="btnWOMSearch" />
+
+                </div>
+                <div class="btnContainer floatLeft">
+
+                    <input type="submit" value="Clear" id="btnWOMClear" />
+                </div>
+            </td>
+            
+        </tr>
+        
+        <tr class="blankrow1"></tr>
+        <tr class="blankrow1"></tr>
+        <tr class="blankrow1"></tr>
+    </table>
+
+
+}
+<div id="ddd"></div>
+
+
+     <script id="template" type="text/x-kendo-template">
+ </script>
+ 
+ <div id="kntemplate" style="display:none;">
+
+    <form id="frmFillgrid">
+        <div style="display:block;" class="custTool">
+            <table style="  text-align: left;font-style: italic;">
+                <tr>
+                    <td> 
+                    @Html.CheckBoxFor(d => d.SuggestedLots) @Html.CustomLabelFor(d => d.SuggestedLots) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.CustomerOrders) @Html.CustomLabelFor(d => d.CustomerOrders) </td>
+                    <td class="fspace"></td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td> @Html.CheckBoxFor(d => d.SpillOver) @Html.CustomLabelFor(d => d.SpillOver) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.Events) @Html.CustomLabelFor(d => d.Events) </td>
+                    <td class="fspace"></td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td> @Html.CheckBoxFor(d => d.LockedLots) @Html.CustomLabelFor(d => d.LockedLots) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.MaxBuild) @Html.CustomLabelFor(d => d.MaxBuild) </td>
+                    <td class="fspace"></td>
+                    <td> </td>
+                </tr>
+                <tr>
+                    <td> @Html.CheckBoxFor(d => d.ReleasedLotsThisWeek) @Html.CustomLabelFor(d => d.ReleasedLotsThisWeek) </td>
+
+                    <td class="fspace"></td>
+                    <td>@Html.CheckBoxFor(d => d.StockTarget)  @Html.CustomLabelFor(d => d.StockTarget) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.TILs) @Html.CustomLabelFor(d => d.TILs) </td>
+                </tr>
+                <tr>
+                    <td> @Html.CheckBoxFor(d => d.ReleasedLots) @Html.CustomLabelFor(d => d.ReleasedLots) </td>
+
+                    <td class="fspace"></td>
+                    <td>@Html.CheckBoxFor(d => d.ExcludeBuyOrders) @Html.CustomLabelFor(d => d.ExcludeBuyOrders)  </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.Forecast) @Html.CustomLabelFor(d => d.Forecast) </td>
+                </tr>
+                <tr class="blankrow1"></tr>
+               
+                <tr>
+                    <td> @Html.CheckBoxFor(d => d.BodyOnly) @Html.CustomLabelFor(d => d.BodyOnly) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.TrimOnly) @Html.CustomLabelFor(d => d.TrimOnly) </td>
+                    <td class="fspace"></td>
+                    <td> @Html.CheckBoxFor(d => d.GroupOnly) @Html.CustomLabelFor(d => d.GroupOnly) </td>
+                </tr>
+                <tr class="blankrow1"></tr>
+            </table>
+        </div>
+    </form>
+
+</div> 

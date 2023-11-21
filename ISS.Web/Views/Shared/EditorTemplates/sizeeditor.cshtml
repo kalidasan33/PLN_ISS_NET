@@ -1,0 +1,15 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetSkuSizes", "Order").Type(HttpVerbs.Post).Data("WOM.FilterData");
+      }).ServerFiltering(false);
+  })
+      .DataValueField("Size")
+      .DataTextField("SizeDesc")
+  .Events(e =>
+  {
+      e.Change("WOM.SizeChange");
+  })
+)

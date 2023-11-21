@@ -1,0 +1,88 @@
+﻿@using ISS.Core.Model.Order;
+@model WorkOrderDetail
+
+@using (Html.BeginForm("", "", FormMethod.Get, new { Id = "frmDemandId" }))
+{
+    <div id="demandSearch">
+        <table class="ttab">
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.PurchaseOrder)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.LabelFor(m => m.LineItem)
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.LabelFor(m => m.DemandDriver)
+                </td>
+                <td></td>
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr>
+                <td>
+                    @Html.Kendo().TextBoxFor(m => m.PurchaseOrder).HtmlAttributes(new { @class = "uppercase", maxlength = 14 })
+                   
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @Html.Kendo().TextBoxFor(r => r.LineItem).HtmlAttributes(new { @class = "uppercase", maxlength = 6 })
+                </td>
+                <td class="dspace"> </td>
+                <td>
+                    @(Html.Kendo().DropDownListFor(d => d.DemandDriver)
+                                                  .DataSource(source =>
+                                                    {
+                                                        source.Custom()
+                                                                .ServerFiltering(false)
+                                                                .Type("aspnetmvc-ajax")
+                                                                .Transport(transport =>
+                                                                {
+                                                                    transport.Read("GetDemandDriver", "Order");
+                                                                })
+                                                                .Schema(schema =>
+                                                                {
+                                                                    schema.Data("Data");
+                                                                });
+                                                    }).Events(ev => ev.Change("WOM.BUChange"))
+                                                                //.DataTextField("Description")
+                                                    .DataTextField("Code")
+                                                                .DataValueField("Code")
+                                                    
+                    )
+                </td>
+                <td class="dspace"> </td>
+                <td class="buttonalign">
+                    <div class="btnContainer floatRight searchalign">
+                        <input type="submit" value="Save" id="btnDemandSave" />
+                    </div>
+                </td>
+                <td class="dspace"> </td>
+
+
+                <td class="buttonalign">
+                    <div class="btnContainer floatRight">
+                        <input type="button" value="Cancel" id="btnDemandCancel" />
+                    </div>
+
+                </td>
+            </tr>
+       </table>     
+    </div>
+}
+
+
+<style>
+    #demandSearch .k-grid-content {
+        min-height: 100px;
+    }
+
+    .k-grid-header th.k-header, .k-filter-row th {
+        white-space: normal;
+    }
+
+    #demandSearch .uppercase {
+        text-transform: uppercase;
+    }
+</style>  

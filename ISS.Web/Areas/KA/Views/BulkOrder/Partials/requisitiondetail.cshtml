@@ -1,0 +1,189 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+@using KA.Core.Model.BulkOrder;
+
+@model KA.Core.Model.BulkOrder.BulkOrderDetail
+
+@*@using (Html.BeginForm("frmCRDet", "Order", FormMethod.Post, new { Id = "frmRequisitions" }))
+    {*@
+
+
+<table width="100%">
+    <tr>
+        <td>
+            @using (@Html.BeginForm("ExportBulkOrderDetails", "BulkOrder", FormMethod.Post, new { Id = "frmExportRequisition" }))
+            {
+                <div class="btnContainer floatRight">
+                    <input type="hidden" id="bulkOdrNo" name="BulkNumber" />
+                    <input type="hidden" id="ExpProgramSource" name="ProgramSource" />
+                  @*  <input type="submit" id="btnExportRequisitionDetails" class="excel_btn" tooltip="Export" />*@
+                    <button class="k-button k-button-icontext k-grid-excel" id="btnExportRequisitionDetails" tooltip="Export" type="submit"><span class="k-icon k-i-excel"></span>Export to Excel</button>
+
+                </div>
+            }
+        </td>
+        <td class="dspace"></td>
+        <td class="dspace"></td>
+    </tr>
+</table>
+
+@(Html.Kendo().Grid<BulkOrderDetail>()
+    .Name("grdRequisitionDetail")
+    .Columns(columns =>
+    {
+        
+        columns.Template(@<text></text>).ClientTemplate("<input type='checkbox' class='chkbx'  />")
+    .HeaderTemplate("<label><input type='checkbox' class='chkbxHeader' Id='SelectAll'/> All</label>").Width(LOVConstants.Width.Small2);
+
+        columns.Bound(p => p.LineNumber).Width(LOVConstants.Width.Style);
+        columns.Bound(p => p.Style).Width(LOVConstants.Width.Large1).EditorTemplateName("StyleCodeEditor");
+        //columns.Bound(p => p.Color).Width(LOVConstants.Width.Color);
+        //columns.Bound(p => p.Attribute).Width(LOVConstants.Width.Attribute);
+        //columns.Bound(p => p.Size).Width(LOVConstants.Width.Size);
+        //columns.Bound(p => p.SizeLit).Width(LOVConstants.Width.Size);
+        //columns.Bound(p => p.Rev).Width(LOVConstants.Width.Small3);
+        //columns.Bound(p => p.Uom).Width(LOVConstants.Width.Small3); 
+        columns.ForeignKey<string>(p => p.Color, new List<dynamic>(), "Color", "ColorName").EditorTemplateName("ColorCodeEditor")
+                .Title("Color").Width(LOVConstants.Width.Color);
+        columns.ForeignKey<string>(p => p.Attribute, new List<dynamic>(), "Attribute", "AttributeDesc").EditorTemplateName("AttributeCodeEditor")
+                .Title("Attribute").Width(LOVConstants.Width.Attribute);
+        columns.ForeignKey<string>(p => p.Size, new List<dynamic>(), "Size", "SizeDesc").EditorTemplateName("SizeCodeEditor")
+                .Title("Size").Width(LOVConstants.Width.Size);
+        columns.Bound(p => p.SizeLit).Width(LOVConstants.Width.Small3);
+        columns.ForeignKey<decimal>(p => p.Rev, new List<dynamic>(), "Rev", "RevDesc").EditorTemplateName("RevisionCodeEditor")
+                .Title("Rev").Width(LOVConstants.Width.Small3);
+        columns.ForeignKey<string>(p => p.Uom, new List<dynamic>(), "Uom", "UomDesc").EditorTemplateName("UomCodeEditor")
+       .Title("UOM").Width(LOVConstants.Width.Small3);
+        columns.Bound(p => p.Qty).Width(LOVConstants.Width.Medium1).EditorTemplateName("QtyCodeEditor").HtmlAttributes(new { @class = "ob-right qtyfield" });
+        columns.Bound(p => p.CurrDueDate).Width(LOVConstants.Width.Medium1).Format("{0:" + LOVConstants.DateFormatDisplay + "}").EditorTemplateName("PlanDateEditor");
+        //columns.Bound(p => p.Qty).Width(LOVConstants.Width.Small3);
+        //columns.Bound(p => p.CurrDueDateStr).Width(LOVConstants.Width.Small3); 
+        columns.Bound(p => p.APSStyle).Width(LOVConstants.Width.Style);
+        columns.Bound(p => p.APSColor).Width(LOVConstants.Width.Color);
+        columns.Bound(p => p.APSAttribute).Width(LOVConstants.Width.Attribute);
+        //columns.Bound(p => p.APSSize).Width(LOVConstants.Width.Size);
+        columns.Bound(p => p.APSSizeLit).Width(LOVConstants.Width.Size);
+        columns.Bound(p => p.DmdWkEndDate).Width(LOVConstants.Width.Medium1);
+        //columns.Bound(p => p.BusinessUnit).Width(LOVConstants.Width.Small3);
+        columns.Bound(p => p.DemandSource).Width(LOVConstants.Width.Small3);
+        columns.Bound(p => p.PrioritySeq).Width(LOVConstants.Width.Small3);
+        columns.Bound(p => p.UserId).Width(LOVConstants.Width.Small3);
+        
+        columns.Bound(p => p.ErrorMessage).Width(LOVConstants.Width.Large1);
+
+        columns.Command(command => { command.Custom("DeleteItem").Text(" ").Click("requisitions.removeOrderDetail"); });
+        //columns.Bound(p => p.ProgramSourceDesc).Width(LOVConstants.Width.Large1);
+       // columns.Bound(s => s.ErrorMessage).Width(50)
+              //       .ClientTemplate("<a class='#=(ErrorStatus) ? 'k-icon k-warning ctooltip':' '#' title=\"#=(ErrorStatus) ? ErrorMessage:' '#\">  </a> ");
+    })
+        .ToolBar(toolbar =>
+            {
+                bool? resAdd = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_BULKORDER_SAVE);
+                if (resAdd.HasValue && resAdd.Value)
+                {
+                    toolbar.Create();
+                }
+                bool? resDup = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_BULKORDER_DELETE);
+                if (resDup.HasValue && resDup.Value)
+                {
+                    toolbar.Custom().Text("Duplicate").Name("btnDuplicate");
+                    toolbar.Custom().Text("Delete").Name("btndeletemulti");
+                }
+
+            })
+         .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Cell))
+                    //.Events(e => e.DataBound("requisitions.gridDetailBound"))
+            .Events(e => e.Change("onGridChange").DataBound("requisitions.gridDetailBound").Edit("requisitions.editDataItem")
+            .Edit("requisitions.disableOnEdit")
+        .Save("requisitions.saveDataItem")
+         )
+            .Editable(editable => editable.Mode(GridEditMode.InCell))
+        .AutoBind(false)
+        .Sortable()
+        .Scrollable(scroll =>
+        {
+            scroll.Enabled(true);
+            scroll.Height("auto");
+        })
+
+        .DataSource(dataSource => dataSource
+            .Ajax()
+                .Model(model =>
+                    {
+                        model.Id(p => p.LineNumber);
+                        model.Field(p => p.LineNumber).Editable(false);
+                        model.Field(p => p.Style);
+                        model.Field(p => p.Color);
+                        model.Field(p => p.Attribute);
+                        model.Field(p => p.Size);
+                        model.Field(p => p.SizeLit).Editable(false);
+                        model.Field(p => p.Rev);
+                        model.Field(p => p.Uom).Editable(false);
+                        model.Field(p => p.Qty);
+                        model.Field(p => p.CurrDueDate);
+                        model.Field(p => p.Exception).Editable(false);
+                        model.Field(p => p.ErrorMessage).Editable(false);
+                        model.Field(p => p.ProcessedToOS);
+                        model.Field(p => p.DmdWkEndDate);
+
+                    })
+            .ServerOperation(false)
+            .Batch(true)
+        .Create(update => update.Action("UpdateRequsitionDetails", "../Order"))
+            .Read(read => read.Action("GetRequisitionDetail", "bulkorder" ).Data("requisitions.readDetailData")
+        )
+        .Update(update => update.Action("UpdateRequsitionDetails", "../Order"))
+                    .Destroy(update => update.Action("UpdateRequsitionDetails", "../Order"))
+        )
+    )
+
+
+@*}*@
+
+
+<div class="divQtyPopup" style="display: none">
+<table style="width:100%">
+<tr>
+<!-- <td><input type="text"  id="lblCmt" /></td> -->
+<td><label id="lblQty"></label></td>
+</tr>
+ <tr class="blankrow1"></tr>
+<tr>
+<!-- <td><input type="text"  id="lblCmt" /></td> -->
+<td>Please Select an option <label id="lblLeave"></label></td>
+</tr>
+ <tr class="blankrow1"></tr>
+<tr>
+<td>Round Up to    : <label id="lblUp"></label></td>
+</tr>
+ <tr class="blankrow1"></tr>
+<tr class="roundrnddwn">
+<td>Round Down to  : <label id="lblDown"></label></td>
+<tr>
+ <tr class="blankrow1"></tr>
+</tr>
+<tr>
+<td>
+<input type="submit" value="Leave As" id="btnLeave" /> 
+<input type="submit" value="Round Up" id="btnUp" />
+<input type="submit" value="Round Down" id="btnDown" /></td>
+</tr>
+</table>
+</div>
+
+<div class="divDuplicate" style="display: none">
+
+</div>
+
+<style>
+    #grdRequisitionDetail .k-grid-content  {
+        min-height:200px;
+        max-height:700px;
+    }
+</style>

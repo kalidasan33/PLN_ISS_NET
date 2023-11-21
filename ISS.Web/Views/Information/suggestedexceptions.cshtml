@@ -1,0 +1,172 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Web.Helpers;
+@using ISS.Common;
+@model ISS.Core.Model.Information.ReleasesSearch
+@{
+    ViewBag.Title = "Suggested Exceptions";
+    var list = new List<SuggestedException>();  
+    
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docSEReady();
+
+          @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+            <text>
+        setTimeout('information.loadSEGrid()', 1000);
+            location.hash = 'autoLoad'
+            </text>
+
+        }
+    });
+</script>
+
+
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmSE" }))
+{
+    <div class="expand form1 planForm1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td> @Html.LabelFor(d => d.Planner)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.Style)</td>
+                            <td class="dspace"> </td>
+
+                            <td>@Html.LabelFor(d => d.Color)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.LabelFor(d => d.Attribute)</td>
+                             
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.Planner)
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Style)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Color)</td>
+                            <td class="dspace"> </td>
+                            <td>@Html.Kendo().TextBoxFor(d => d.Attribute)</td>
+                            
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr height="20px"></tr>
+
+                        <tr>
+                            <td colspan="5"> </td>
+                            <td colspan="2">
+                                <div class="btnContainer floatRight">
+                                    <input type="submit" value="Search" id="btnSESearch" />
+                                    <input type="reset" value="Clear" id="btnSEClear" />
+                                    
+                                </div>
+
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                       
+                    </table>
+
+
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                         <label id="FilteredColumns" class="display-filters"></label>
+                          @*<div class="btnContainer floatRight">
+        <input type="submit" id="btnSuggExceptionsExport" class="excel_btn" />
+
+    </div>
+    <br /><br />*@
+                    @(Html.Kendo().Grid<SuggestedException>().Name("grdSE").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.Style).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.Color).Width(LOVConstants.Width.Small3); ;
+                    columns.Bound(p => p.Atribute).Width(LOVConstants.Width.Small3);
+                    columns.Bound(p => p.SizeShortDesc).Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.DmdLoc).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.MfgPath).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.Revision).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(p => p.Reason).HtmlAttributes(new { style = "color:red;" })
+                        .ClientTemplate("<a class='linki1 lnkExc' href='javascript:void(0)'> #=Reason# </a>" );;
+                    
+                    columns.Bound(p => p.ConflictSKU).Width(160);
+                }
+                )
+                          .ToolBar(toolbar =>
+                                                                {
+                                                                    toolbar.Excel();
+                                                                })
+                                                                .Excel(excel => excel
+                                                                    .FileName("SuggestedExceptions" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                                    .Filterable(true)
+                                                                    .AllPages(true)
+                                                                 )
+                .Events(ev =>
+                            ev.DataBound("information.SetViewButtongridDataBound"))
+                .AutoBind(false)
+                        .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                    conf.Enabled(true);
+                })
+                        .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                                     .ForDate(dte => FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("SuggestedExceptions", "Information");
+                        read.Data("information.searchDataSE");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>
+ 

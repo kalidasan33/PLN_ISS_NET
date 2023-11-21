@@ -1,0 +1,14 @@
+﻿@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetDemandDriversDrpdn", "Order").Type(HttpVerbs.Post).Data("WO.retrieveDemand");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Code")
+  .DataTextField("Description")
+      //.OptionLabel("--Select--")
+)
+
+

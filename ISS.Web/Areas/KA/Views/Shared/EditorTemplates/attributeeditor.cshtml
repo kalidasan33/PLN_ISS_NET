@@ -1,0 +1,14 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetAttributeCodes", "../Order").Type(HttpVerbs.Post).Data("WOM.AttrFilterData");
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Attribute")
+  .DataTextField("Attribute")
+  .Events(e => e.Change("WOM.AttributeChange"))
+)

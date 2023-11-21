@@ -1,0 +1,120 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+
+
+@model RequisitionOrderSearch
+
+
+@using (Html.BeginForm("CreateRequisitions", "Order", FormMethod.Post, new { Id = "frmRetOrder" }))
+{
+
+    <table class="ttab">
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td> @Html.CustomLabelFor(d => d.Planner)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.WorkCenter)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.Style)</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.Color)</td>
+            <td class="dspace"> </td>
+            <td style="padding:0px !important;">
+                <table>
+                    <tr>
+
+                        <td style="padding:0px !important;">@Html.CustomLabelFor(d => d.Attribute) </td>
+                        <td class="dspace"> </td>
+                        <td>@Html.CustomLabelFor(d => d.Size) </td>
+                    </tr>
+                </table>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td> @Html.Kendo().TextBoxFor(d => d.Planner).HtmlAttributes(new { @class = "clsupper" }) </td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.WorkCenter).HtmlAttributes(new { @class = "clsupper" })</td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Style).HtmlAttributes(new { @class = "clsupper" })</td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Color).HtmlAttributes(new { @class = "clsupper" })</td>
+            <td class="dspace"> </td>
+            <td style="padding:0px !important;">
+                <table>
+                    <tr>
+
+                        <td style="padding:0px !important;">@Html.Kendo().TextBoxFor(d => d.Attribute).HtmlAttributes(new { @class = "clsupper widths" })</td>
+                        <td class="tspace"> </td>
+                        <td>@Html.Kendo().TextBoxFor(d => d.Size).HtmlAttributes(new { @class = "clsupper widths" })</td>
+                    </tr>
+                </table>
+            </td>
+            <td> </td>
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        <tr>
+            <td> @Html.CustomLabelFor(d => d.SewPlant)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.Dc)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.SewDate,"datefor")</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.DcDueDate, "datefor")</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.SuggWO)</td>
+
+            <td> </td>
+        </tr>
+        <tr>
+            <td> @Html.Kendo().TextBoxFor(d => d.SewPlant).HtmlAttributes(new { @class = "clsupper" }) </td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.Dc).HtmlAttributes(new { @class = "clsupper" })</td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().DatePickerFor(d => d.SewDate).HtmlAttributes(new { placeholder = "MM/DD/YYYY" }) </td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().DatePickerFor(d => d.DcDueDate).HtmlAttributes(new { placeholder = "MM/DD/YYYY" }) </td>
+            <td class="dspace"> </td>
+            <td>
+                @(Html.Kendo().DropDownListFor(model => model.SuggWO).DataTextField("Text").DataValueField("Value")
+                .Value(LOVConstants.DefaultSuggWO.ToString())
+                .DataSource(source =>
+             {
+                 source.Custom().ServerFiltering(false).Type("aspnetmvc-ajax").Transport(transport =>
+                 {
+                     transport.Read("GetSuggestedWOWeek", "Order");
+
+                 }).Schema(schema => { schema.Data("Data"); });                  
+             }).Events(e=> e.DataBound("requisitions.suggWODataBound")).HtmlAttributes(new { @class = "widths" }))
+                
+            </td>
+           
+            <td class="buttonalign">
+                <div class="btnContainer floatRight">
+                    <input type="submit" value="Retrieve Orders" id="btnRetOrderSearch" />
+
+                </div>
+            </td>
+
+            <td class="buttonalign">
+                <div class="btnContainer floatRight">
+
+                    <input type="reset" value="Clear" id="btnRetOrderClear" />
+                </div>
+            </td>
+
+            
+        </tr>
+        <tr class="blankrow1"></tr>
+       
+    </table>
+
+}

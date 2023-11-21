@@ -1,0 +1,127 @@
+﻿@using Kendo.Mvc.UI;
+@using KA.Core.Model.MaterialSupply;
+@using ISS.Common;
+
+@model  List<Dictionary<string,dynamic>>
+
+@(Html.Kendo().Grid<MaterialPAB>().Name("grdSupply").HtmlAttributes(new { @class = "kgridheight" })
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .Model(model => model.Id(m => m.DC))
+            .Read(read =>
+            {
+                read.Action("BlankSupplyDetails", "BlankSupply");
+                read.Data("MS.MSSearchParam");
+            })
+                    
+            )
+            .AutoBind(false)
+            .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+                        }).Resizable(resizing => resizing.Columns(true))
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.SKU).Width(LOVConstants.Width.Large1);
+                columns.Bound(c => c.DC);
+            })
+                //.ToolBar(toolbar =>
+                //              {
+                //                  toolbar.Excel();
+                //              })
+                .Events(ev => ev.DetailInit("MS.initChildGridSize").DataBound("MS.SuppyGridDataBound"))
+            .ClientDetailTemplateId("detTempSize")
+            
+)
+
+<br />
+<br />
+
+
+<script type="text/x-kendo-temp" id="detTempSize">
+    @(Html.Kendo().Grid<MaterialPAB>()
+        .Name("grdDC#=DC#").HtmlAttributes(new { @class = "kgridheight" })
+        .Columns(cols =>
+        {
+            cols.Bound(c => c.Size);
+        })
+        .AutoBind(false)
+        .Scrollable(scroll =>
+                    {
+                        scroll.Enabled(true);
+                        scroll.Height("auto");
+                    }).Resizable(resizing => resizing.Columns(true))
+                .Events(e => e.DetailInit("MS.initChildGridPAB").DataBound("MS.SuppyGridDataBound"))
+        .ClientDetailTemplateId("detTempPAB")
+        .DataSource(ds => ds.Ajax().ServerOperation(false))
+        .ToClientTemplate()
+                
+                    
+    )
+</script>
+
+<script type="text/x-kendo-temp" id="detTempPAB">
+    @(Html.Kendo().Grid<PABDetail>()
+        .Name("grdPAB#=DC##=SizeCD#").HtmlAttributes(new { @class = "kgridheight" })
+        .Columns(cols =>
+        {
+            cols.Bound(m => m.PABType).Width(LOVConstants.Width.Medium1).Locked(true);
+            cols.Bound(m => m.Total).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" }).Locked(true);
+            foreach (var c in ViewBag.MSGridHeader)
+                cols.Bound(c.FiscalWeekStr).Width(LOVConstants.Width.Medium1).Title(c.FiscalWeekTitle).HtmlAttributes(new { @class = "ob-right" });
+        })
+        .AutoBind(false)
+        .Scrollable(scroll =>
+                    {
+                        scroll.Enabled(true);
+                        scroll.Height("auto");
+                    }).Resizable(resizing => resizing.Columns(true))
+        .DataSource(ds => ds.Ajax().ServerOperation(false))
+        .ToClientTemplate()
+    )
+</script>
+
+
+
+
+
+
+
+
+@*@(Html.Kendo().Grid<PABDetail>().Name("grdSupply").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+        columns =>
+        {
+            columns.Bound(m => m.PABType).Width(LOVConstants.Width.Medium1).Locked(true);
+            columns.Bound(m => m.Total).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" }).Locked(true);
+
+            foreach (var c in ViewBag.MSGridHeader)
+                columns.Bound(c.FiscalWeekStr).Width(LOVConstants.Width.Medium1).Title(c.FiscalWeekTitle).HtmlAttributes(new { @class = "ob-right" });
+                    
+            
+            //.ClientTemplate("#= kendo.toString(FiscalWeekStr, 'n1')#");
+                    //.ClientTemplate("<a  data-weekStr=" + c.FiscalWeekStr + " class='linki2 lnkStyle' href='javascript:void(0)' onclick= '#=MS.returnVal(data('weekStr'))#'>1  </a>");
+            //.ClientTemplate("<a class='linki2 lnkStyle' href='javascript:void(0)' > \"'#= FiscalWeekStr #'\" </a>");
+                   
+                                
+        }
+    )
+    .AutoBind(false)
+            .Scrollable(scroll =>
+            {
+                scroll.Enabled(true);
+                scroll.Height("auto");
+            }).Resizable(resizing => resizing.Columns(true))
+                           
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .ServerOperation(false)
+        .Read(read =>
+        {
+            read.Action("BlankSupplyDetails", "BlankSupply");
+            read.Data("MS.MSSearchParam");
+        })
+                 
+    )
+        .Events(ev => ev.DataBound("MS.onGridDataBound"))
+)*@

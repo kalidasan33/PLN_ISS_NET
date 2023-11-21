@@ -1,0 +1,265 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Information;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@model ISS.Core.Model.Information.DCWorkOrderSearch
+@{
+    ViewBag.Title = "DC Work Orders"; 
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/information" + ISSGlobals.Version)
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        information.docDCWorkOrdersReady();
+    });
+</script>
+ 
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+@using (Html.BeginForm("", "", FormMethod.Post, new { Id = "frmDCWorkOrders" }))
+{
+    <div class="expand planForm1 form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Search Criteria")
+                .Content(@<div>
+
+                    <table class="ttab">
+    <tr class="blankrow1"></tr>
+    <tr>
+        <td> @Html.LabelFor(d => d.Plant)</td>
+        <td class="dspace"> </td>
+
+        <td>@Html.LabelFor(d => d.RequestNumber)</td>
+        <td class="dspace"> </td>
+
+        <td>@Html.LabelFor(d => d.projectNumber)</td>
+        <td class="dspace"> </td>
+        <td>@Html.LabelFor(d => d.ExpectedDate, new { @class="datefor"})</td>
+        <td class="dspace"> </td>
+        <td>@Html.LabelFor(d => d.Remarks)</td>
+        <td class="dspace"> </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.Kendo().TextBoxFor(d => d.Plant)
+
+        </td>
+        <td class="dspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.RequestNumber).HtmlAttributes(new { @class = "widthm1 clsupper" })</td>
+        <td class="dspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.projectNumber).HtmlAttributes(new { @class = "widthm1 clsupper" })</td>
+        <td class="dspace"> </td>
+        <td>@Html.Kendo().DatePickerFor(d => d.ExpectedDate).HtmlAttributes(new { @class = "excludeF", placeholder = "MM/DD/YYYY" })</td>
+        <td class="dspace"> </td>
+        <td>@Html.Kendo().TextBoxFor(d => d.Remarks).HtmlAttributes(new { @class = "widthm1 clsupper" })</td>
+        <td class="dspace"> </td>
+    </tr>
+    <tr height="20px"></tr>
+                        <tr>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                        <td> @Html.LabelFor(d => d.FromStyle)</td>
+                                        <td class="tspace"> </td>
+                                        <td>&nbsp;&nbsp;@Html.LabelFor(d => d.FromColor)</td>
+                                       
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                        <td>@Html.LabelFor(d => d.FromAttribute)</td>
+                                        <td class="tspace"> </td>
+                                        <td>@Html.LabelFor(d => d.FromSizeCd)</td>
+                                        
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                        <td>@Html.LabelFor(d => d.ToStyle)</td>
+                                        <td class="tspace"> </td>
+                                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;@Html.LabelFor(d => d.ToColor)</td>
+                                         
+
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+
+                                <table class="">
+                                    <tr>
+                                        <td>@Html.LabelFor(d => d.ToAttribute)</td>
+                                        <td class="tspace"> </td>
+                                        <td>@Html.LabelFor(d => d.ToSizeCd)</td>
+                                        
+                                    </tr>
+                                </table>
+                            </td>
+                            <td></td>
+                            <td class="dspace"> </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                        <td>@Html.Kendo().TextBoxFor(d => d.FromStyle).HtmlAttributes(new { @class="widths" })</td>
+                                        <td class="tspace"> </td>
+                                        <td>@Html.Kendo().TextBoxFor(d => d.FromColor).HtmlAttributes(new { @class = "widths" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                      
+                                        <td>@Html.Kendo().TextBoxFor(d => d.FromAttribute).HtmlAttributes(new { @class="widths" })</td>
+                                        <td class="tspace"> </td>
+                                        <td>&nbsp;&nbsp;&nbsp;@Html.Kendo().TextBoxFor(d => d.FromSizeCd).HtmlAttributes(new { @class="widths" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                       
+                                        <td>@Html.Kendo().TextBoxFor(d => d.ToStyle).HtmlAttributes(new { @class="widths" })</td>
+                                        <td class="tspace"> </td>
+                                        <td>@Html.Kendo().TextBoxFor(d => d.ToColor).HtmlAttributes(new { @class = "widths" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                <table class="">
+                                    <tr>
+                                      
+                                        <td>@Html.Kendo().TextBoxFor(d => d.ToAttribute).HtmlAttributes(new { @class="widths" })</td>
+                                        <td class="tspace"> </td>
+                                        <td>@Html.Kendo().TextBoxFor(d => d.ToSizeCd).HtmlAttributes(new { @class="widths" })</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                               @Html.CustomCheckBoxFor(d => d.hasRemarks)
+                            </td>
+
+                        </tr>
+
+              <tr class="blankrow1"></tr>
+
+                                    <tr>
+                                        <td colspan="9">
+                                            <div class="btnContainer floatRight">
+                                                <input type="submit" value="Search" id="btnDCWorkOrdersSearch" />
+                                                <input type="reset" value="Clear" id="btnDCWorkOrdersClear" />
+                                               
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+
+                                   
+                                    <tr class="blankrow1"></tr>
+                                </table>
+
+
+</div>).Expanded(true);
+
+            panelbar.Add().Text("Search Results")
+            .Content(@<div id="releaseResults">
+                          <label id="FilteredColumns" class="display-filters"></label>
+                          @*<div class="btnContainer floatRight">
+        <input type="submit" id="btnDCWorkOrdersExport" class="excel_btn" />
+    </div>
+    <br /><br />*@
+                    @(Html.Kendo().Grid<DCWorkOrder>().Name("grdDCWorkOrders").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+                    columns.Bound(p => p.CreatedDate).Width(LOVConstants.Width.Medium2).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+
+                    columns.Bound(p => p.Plant).Width(LOVConstants.Width.Small3); ;
+                    columns.Bound(p => p.RequestNumber).Width(LOVConstants.Width.Medium1); ;
+                    columns.Bound(p => p.projectNumber).Width(LOVConstants.Width.Medium3);
+                    columns.Bound(p => p.FromStyle).Width(LOVConstants.Width.Style);
+                    columns.Bound(p => p.FromColor).Width(LOVConstants.Width.Color);
+                    columns.Bound(p => p.FromStyleAttribute).Width(LOVConstants.Width.Attribute);
+                    columns.Bound(p => p.FromSizeCd).Width(LOVConstants.Width.Size);
+                    columns.Bound(p => p.ToStyle).Width(LOVConstants.Width.Style);
+                    columns.Bound(p => p.ToColor).Width(LOVConstants.Width.Color);
+                    columns.Bound(p => p.ToStyleAttribute).Width(LOVConstants.Width.Attribute);
+                    columns.Bound(p => p.ToSizeCd).Width(LOVConstants.Width.Size);
+                    columns.Bound(p => p.OriginalDozens).Width(LOVConstants.Width.Small3).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.CompleteDozens).Width(LOVConstants.Width.Medium1).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.PendingDozens).Width(90).HtmlAttributes(new { @class = "ob-right" });
+                    columns.Bound(p => p.ExpectedDate).Width(LOVConstants.Width.Medium3).Format("{0:" + LOVConstants.DateFormatDisplay + "}");
+                    columns.Bound(p => p.Remarks).Width(250).HtmlAttributes(new { style = "color:red;" });
+                }
+                )
+
+                .AutoBind(false)
+                         .ToolBar(toolbar =>
+                                                                        {
+                                                                            toolbar.Excel();
+                                                                        })
+                                                                        .Excel(excel => excel
+                                                                            .FileName("DCWorkOrders" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx")
+                                                                            .Filterable(true)
+                                                                            .AllPages(true)
+                                                                         )
+                .Scrollable(scroll =>
+                {
+                    scroll.Enabled(true);
+                    scroll.Height("auto");
+                }).Resizable(resizing => resizing.Columns(true)).Pageable(conf =>
+                {
+                    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                })
+                                                .Filterable(filterable => filterable
+                                        .Extra(false)
+                                        .Operators(operators => operators
+                                            .ForString(str => FilterHelper.FilterString(str))
+                                            .ForNumber(num => FilterHelper.FilterNumber(num))
+                                            .ForDate(dte=>FilterHelper.FilterDate(dte))
+
+                                        )
+                                        )
+                        .Sortable().Events(ev => ev.DataBound("information.gridDataBoundStyle"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .ServerOperation(false)
+                            .PageSize(ISS.Common.LOVConstants.DefaultPageSizes)
+                    .Read(read =>
+                    {
+                        read.Action("DCWorkOrders", "Information");
+                        read.Data("information.searchDataDCWorkOrders");
+                    })
+                )
+                    )
+
+
+                </div>).Expanded(true);
+
+        })
+
+
+        )
+
+    </div>
+}
+<div class="clear"></div>

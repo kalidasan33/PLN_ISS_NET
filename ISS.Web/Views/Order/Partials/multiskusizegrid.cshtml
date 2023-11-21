@@ -1,0 +1,111 @@
+﻿@using ISS.Core.Model.Order;
+@model MultiSKUSizes
+
+@(Html.Kendo().Grid<MultiSKUSizes>()
+        .Name("grdMultiSKUSize")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.SizeCD);
+            columns.Bound(p => p.Size);
+            columns.Bound(p => p.Qty).EditorTemplateName("QtyMultiSKUEditor").HtmlAttributes(new { @class="SizQty"})
+                //columns.Bound(p => p.Qty)//.EditorTemplateName("QtyMultiSKUEditor")//.Format("{0:n0}")
+                .ClientFooterTemplate("Sum Dz: #= kendo.toString(sum, 'n0') #");
+            //columns.Command(command => { command.Destroy(); });
+        })
+        .Selectable(selectable => selectable
+        .Mode(GridSelectionMode.Single)
+        .Type(GridSelectionType.Cell))
+        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+        .AutoBind(false)
+        .Sortable()
+        .Scrollable().Navigatable()
+        .HtmlAttributes(new { style = "height:430px;" })
+            .Events(e => e.Edit("WO.onSave").Save("WO.onSave") )
+            //.Events(e => e.Edit("onSave").Save("onSave").Remove("onRemove"))
+                .Events(e => e.DataBound("WO.MultisizeDataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .ServerOperation(false)
+            .Batch(true)
+                .Events(events => events.Error("error_handler"))
+                .Model(model =>
+                {
+                    model.Id(p => p.SizeCD);
+                    model.Field(p => p.Size).Editable(false);
+                    model.Field(p => p.SizeCD).Editable(false);
+                })
+               .Aggregates(aggregates => aggregates.Add(p => p.Qty).Sum())
+                       .Read(read => read.Action("GetMultiSkuSizes", "Order", new { area = "" }).Data("WO.multiSizeLoad")
+                   
+            )
+        )
+    )
+
+ 
+
+
+
+@using (Html.BeginForm("duplicateSize", "Order", FormMethod.Get, new { Id = "frmSizePopup" }))
+{
+ <br />
+    <div class="btnContainer floatRight">
+        @{
+    var listOrderStatus = new List<SelectListItem>(){
+                            new SelectListItem()
+                                {
+                                    Text ="Single Order(s)" ,
+                                    Value ="Single Order(s)"
+                                } ,
+                              new SelectListItem()
+                                {
+                                    Text ="Multi-SKU Order" ,
+                                    Value ="Multi-SKU Order"
+                                } ,
+
+                            };
+        }
+        @(Html.Kendo().DropDownList()
+            .DataTextField("Text")
+            .DataValueField("Value")
+                        .BindTo(listOrderStatus)
+                        .Name("SizeOrderType")
+                .HtmlAttributes(new { @data_val_required = "Please select an Order Type." })
+                 .OptionLabel("--Select order type--")
+
+        )
+
+
+
+
+
+    </div>
+    <br />
+    <br />
+    <br />
+<div class="btnContainer floatRight">
+    <input type="submit" value="Save" id="btnWOSizeSave" />
+
+    &nbsp;&nbsp;&nbsp;
+    </div>
+   
+}
+
+<script>
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+           
+        }
+    }
+
+      
+
+  
+</script>

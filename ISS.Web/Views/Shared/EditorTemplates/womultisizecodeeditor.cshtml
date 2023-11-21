@@ -1,0 +1,8 @@
+﻿@model string
+<input type="text" id="SizeQty" name="SizeQty" class="k-textbox" required ondblclick="WO.onSizeCodeClick(this);" onchange="WO.onSizetoQty(this);" onkeypress="WO.isNumber(this);" onfocusout="WO.isZero(this);" />
+@*@(Html.Kendo().NumericTextBox().HtmlAttributes(new { ondblclick = "onQtyCodeClick(this);",  onblur="WO.onSizeCodeClick(this);" })
+    required ondblclick="WO.onSizeCodeClick(this);" onblur="WO.onSizeCodeClick(this);" />
+    )*@
+
+
+

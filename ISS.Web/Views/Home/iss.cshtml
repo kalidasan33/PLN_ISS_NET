@@ -1,0 +1,78 @@
+﻿@using Kendo.Mvc.UI;
+@{
+    ViewBag.Title = "Style Search";
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+        //ShowInformationReleases();
+    });
+</script>
+<div class="expand  width100" id="contentDiv">
+    @(Html.Kendo().TabStrip()
+          .Name("information_Section")
+          .Items(tabstrip =>
+          {
+              tabstrip.Add().Text("Releases")
+                  .ImageUrl(Url.Content("~/images/icon_print.png"))
+                  .Content(@<div>
+                    @Html.Partial("_Information.Releases")
+            </div>);
+
+              tabstrip.Add().Text("Suggested Exceptions")
+                  .ImageUrl(Url.Content("~/images/icon_print.png"))
+                  .Content(@<div>
+                    @Html.Partial("_Information.Sku")
+            </div>);
+
+              tabstrip.Add().Text("DC Work Orders")
+                  .ImageUrl(Url.Content("~/images/icon_print.png"))
+                  .Content(@<div>
+                </div>);
+
+              tabstrip.Add().Text("Style Exception")
+                  .ImageUrl(Url.Content("~/images/icon_print.png"))
+                  .Content(@<div>
+                </div>);
+
+              tabstrip.Add().Text("Style W/O Textile Grp")
+                        .ImageUrl(Url.Content("~/images/icon_print.png"))
+                        .Content(@<div>
+                        </div>);
+
+              tabstrip.Add().Text("Blown Away Lots")
+                        .ImageUrl(Url.Content("~/images/icon_print.png"))
+                        .Content(@<div>
+                        </div>);
+
+              tabstrip.Add().Text("Bulks to AVYX")
+                              .ImageUrl(Url.Content("~/images/icon_print.png"))
+                              .Content(@<div>
+                            </div>);
+              tabstrip.Add().Text("BulkstoOneSource")
+                                    .ImageUrl(Url.Content("~/images/icon_print.png"))
+                                    .Content(@<div>
+                                    </div>);
+          }).SelectedIndex(0)
+)
+</div>
+<div class="clear"></div>
+
+@*@(Html.Kendo().Grid<ISS.Web.Controllers.MyClass>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Id).Width(100);
+        columns.Bound(p => p.Name).Width(300);
+    })
+    .Pageable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .HtmlAttributes(new { style = "height:430px;" })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(20)
+            .Read(read => read.Action("GetSkuInfo", "Home"))
+     )
+)*@
+

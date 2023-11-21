@@ -1,0 +1,244 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+@model ISS.Core.Model.Order.WorkOrderDetail
+
+@using (Html.BeginForm("WorkOrderEdit", "Order", FormMethod.Post, new { Id = "frmWoEditor" }))
+{
+    @Html.Hidden("gridMode");
+    @Html.Hidden("AsrtCode");
+    @Html.Hidden("PrimaryDC");
+    @Html.Hidden("OrderDetailId");
+    @Html.Hidden("NewStyle");
+    @Html.Hidden("NewColor");
+    @Html.Hidden("NewAttribute");
+    @Html.Hidden("NewSize");
+    @Html.Hidden("OriginTypeCode");
+    @Html.Hidden("RoutingId");
+    @Html.Hidden("BusinessUnit");
+    @Html.Hidden("GStyle");
+    @Html.Hidden("GColor");
+    @Html.Hidden("GAttribute");
+    @Html.Hidden("GSize");
+    @Html.Hidden("ProdFamCode");
+   
+
+    <table class="ttab">
+        <tr class="blankrow1"></tr>
+       
+        </table>
+    <table class="ttab">
+        <tr class="blankrow1"></tr>
+        <tr>
+
+            <td> @Html.CustomLabelFor(d => d.SellingStyle)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.ColorCode)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.Attribute)</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.Size) @*<span style="color:red">*</span>*@</td>
+           
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.Revision)</td>
+            <td class="dspace"> </td>
+        </tr>
+
+
+        <tr>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.SellingStyle)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @*@(Html.Kendo().MultiSelectFor(d => d.ColorCode).Filter(FilterType.StartsWith).MaxSelectedItems(1).Placeholder("--Select Color--")
+
+                  .AutoClose(true)
+                  .DataValueField("Color")
+                  .DataTextField("ColorName")
+
+                      .Events(e =>
+                      {
+
+                          e.Change("WO.onColorChange");
+                         e.DataBound("WO.onColorBound");
+
+
+
+
+                      })
+                )*@
+                @(Html.Kendo().ComboBoxFor(d => d.ColorCode).Filter(FilterType.StartsWith)
+                 .DataSource(source =>
+                  {
+                      source.Read(read =>
+                      {
+                          read.Action("GetColorCodes", "../Order").Type(HttpVerbs.Post).Data("WO.retrieveColorData");
+                      }).ServerFiltering(false);
+                  })
+                  .DataValueField("Color")
+                  .DataTextField("ColorName")
+
+                      .Events(e =>
+                      {
+
+                          e.Change("WO.onColorChange");
+                          e.DataBound("WO.onColorBound");
+                          //e.Select("WO.onColorChange");
+
+
+                      })
+                )
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @(Html.Kendo().ComboBoxFor(d => d.Attribute).Filter(FilterType.StartsWith)
+                         .DataSource(source =>
+                          {
+                              source.Read(read =>
+                              {
+                                  read.Action("GetAttributeCodes", "../Order").Route("").Type(HttpVerbs.Post).Data("WO.retrieveAttributeData");
+                              }).ServerFiltering(false);
+                          })
+                                //.CascadeFrom("ColorCode")
+                           .DataValueField("Attribute")
+                                  .DataTextField("Attribute")
+                              .Events(e =>
+                              {
+
+                                  e.Change("WO.onAttributeChange");
+                                  e.DataBound("WO.onAttributeBound");
+                                  //e.Select("WO.onAttributeChange");
+                              })
+                )
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.Hidden("MultiSizeList")
+                @(Html.Kendo().ComboBoxFor(d => d.Size).Filter(FilterType.StartsWith)
+                         //.DataSource(source =>
+                         // {
+                         //     source.Read(read =>
+                         //     {
+                         //         read.Action("GetSizes", "../Order").Route("").Type(HttpVerbs.Post).Data("WO.multiSizeLoad");
+                         //     }).ServerFiltering(false);
+                         // })
+                          .AutoBind(false)
+                            .DataValueField("Size")
+                            .DataTextField("SizeDesc")
+                          // .DataValueField("SizeCD")
+                          //.DataTextField("Size")
+                      .Events(e =>
+                      {
+                          e.Change("WO.onSizeChange");
+                         //e.DataBound("WO.MultiSizeData");
+                          //e.Select("WO.MultiSizeData");
+                      })
+                )
+
+                
+            </td>
+            <td class="dspace"> </td>
+
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.Revision)
+            </td>
+            <td class="dspace"> </td>
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td> @Html.CustomLabelFor(d => d.PKGStyle)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.MfgPathId)</td>
+            <td class="dspace"> </td>
+
+            <td>@Html.CustomLabelFor(d => d.GarmentSKU)</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.PackCode)</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.PriorityCode)</td>
+            <td class="dspace"> </td>
+            
+        </tr>
+
+        <tr>
+            <td>
+
+                @Html.Kendo().TextBoxFor(d => d.PKGStyle)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+
+                @Html.Kendo().TextBoxFor(d => d.MfgPathId)
+            </td>
+            <td class="dspace"> </td>
+            <td>@Html.Kendo().TextBoxFor(d => d.GarmentSKU).Enable(false)</td>
+            <td class="dspace"> </td>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.PackCode)
+            </td>
+            <td class="dspace"> </td>
+            <td>
+                
+                @Html.Kendo().NumericTextBoxFor(d => d.PriorityCode).Min(0).Max(99).Decimals(0).HtmlAttributes(new { @class = "widths" }).Format("#").Value(50)
+            </td>
+            <td class="dspace"> </td>
+            
+
+        </tr>
+        <tr class="blankrow1"></tr>
+        <tr>
+            <td> @Html.CustomLabelFor(d => d.AttributionPath)</td>
+            <td class="dspace"> </td>
+            <td>@Html.CustomLabelFor(d => d.DozenStr) </td>
+            <td class="dspace"> </td>
+           
+            <td>@Html.CustomLabelFor(d => d.BulkNumber)
+              
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.AttributionPath).Enable(false)
+
+            </td>
+            <td class="dspace"> </td>
+           
+            <td>
+                @Html.Kendo().TextBoxFor(d => d.DozenStr).HtmlAttributes(new { @class = "DozenEaches", @maxlength = "12" })
+            </td>
+            <td class="dspace"> </td>
+           
+            <td>@Html.Kendo().TextBoxFor(d => d.BulkNumber).HtmlAttributes(new { @onkeypress = "WO.isNumber(this);", onpaste = "return false", @maxlength = "10" })</td>
+        </tr>
+        <tr class="blankrow1"></tr>
+
+        
+        <tr>
+            <td colspan="4">
+                @Html.CustomLabelFor(d => d.Note)
+            </td>
+
+        </tr>
+        <tr>
+            <td colspan="6"> @Html.TextAreaFor(d => d.Note, new { style = "width: 400px; height:60px;" })</td>
+        </tr>
+    </table>
+
+    <div class="k-header k-grid-toolbar k-grid-top ">
+        <div class="floatRight">
+            <a class="k-button k-button-icontext k-grid-save-changes" href="javascript:void(0)" onclick='WO.saveWODetail()' name="saveGrid"><span class="k-icon k-update"></span>Ok</a>
+            <a class="k-button k-button-icontext k-grid-cancel-changes" href="javascript:void(0)" onclick='WO.cancelWODetail(false)' name="cancelGrid"><span class="k-icon k-cancel"></span>Cancel </a>
+        </div>
+    </div>
+
+
+}

@@ -1,0 +1,415 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+
+
+@model ISS.Core.Model.Order.WorkOrderHeader
+
+@{
+    ViewBag.Title = "Attributed Work Orders";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/AttributtedCWO" + ISSGlobals.Version)
+}
+<style>
+  #myDiv{
+        max-width:900px;
+    }
+  #myDiv  .k-textbox , #myDiv .k-dropdown, #myDiv .k-datepicker, #myDiv .k-numerictextbox{
+      width:130px !important;
+  }
+    </style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        WO.doCreateWOReady();
+        WO.docWOReady2();
+        WO.CreateOrder.url = '@Url.Action("InsertAttributionOrder", "order")'
+        WO.const.urlGetAlternateId = '@Url.Action("GetCuttingAltId", "order", new { area = "" })'
+        WO.const.urlPopulateCutPathTxtPath = '@Url.Action("PopulateCutPathTxtPath", "order", new { area = "" })'
+        WO.const.urlChangeYear = '@Url.Action("GetPlannedDate", "order", new { area = "" })'
+        WO.const.urlAsrtCode = '@Url.Action("GetWOAsrtCode", "order", new { area = "" })'
+        WO.const.urlRetrieve = '@Url.Action("GetAORetrieve", "order", new { area = "" })'
+        WO.const.urlGetRevision = '@Url.Action("GetMaxRevision", "order", new { area = "" })'
+        WO.const.urlGetPKGStyle = '@Url.Action("GetPKGStyle", "order", new { area = "" })'
+        WO.const.urlGetChildSKU = '@Url.Action("GetWOChildSKU", "order", new { area = "" })'
+        WO.const.urlGetGarmentSKU = '@Url.Action("GetGarmentSKU", "order", new { area = "" })'
+        WO.const.urlGetGroupId = '@Url.Action("GetGroupID", "order", new { area = "" })'
+        WO.const.urlGetColor = '@Url.Action("GetColorCodes", "order", new { area = "" })'
+        WO.const.urlCancelAWO = '@Url.Action("CancelWODetail", "order", new { area = "" })'
+        WO.const.urlMfgPath = '@Url.Action("GetKAMFGPathId", "AttributionOrder", new { area = "KA" })'
+        WO.const.urlGetSkuSizes = '@Url.Action("GetSizes", "order", new { area = "" })'
+        WO.const.urlGetBulkGroupId = '@Url.Action("GetBulkGroupID", "order", new { area = "" })'
+        WO.const.urlMfgPathDetail = '@Url.Action("GetKAMFGPathDetails", "AttributionOrder", new { area = "KA" })'
+        WO.const.urlValidatePKGStyle = '@Url.Action("ValidatePKGStyle", "AttributionOrder", new { area = "KA" })'
+        WO.const.urlDCLocations = '@Url.Action("GetAODCLocations", "AttributionOrder", new { area = "KA" })'
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+
+            @*<text>
+
+        setTimeout('WO.loadDetailsGrdFromWOM()', 1000);
+        location.hash = 'autoLoad'
+        </text>*@
+
+
+        }
+
+    });
+
+
+
+</script>
+
+<style type="text/css">
+    .k-grid-content {
+        min-height: 100px;
+    }
+</style>
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+
+
+    <div class="expand planForm1  form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Attributed Order Information")
+                .Content(@<div>
+@using (Html.BeginForm("CreateWorkOrder", "../Order", FormMethod.Get, new { Id = "frmWO" }))
+{
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Dc)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedWeek)
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedYear)
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedDate,"datefor")
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.OrdersToCreate)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannerCd)
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(m => m.SuperOrder)
+                                @*@Html.Kendo().TextBoxFor(d => d.Dc).Enable(false).HtmlAttributes(new { @class = "widths" })*@
+                                @Html.Kendo().ComboBoxFor(d => d.Dc).HtmlAttributes(new { @class = "widths" }).Filter(FilterType.StartsWith).DataTextField("DC").DataValueField("DC").Events(e=>e.Change("WO.onDCChange"))
+                            </td>
+                            <td class="dspace"> </td>
+                           
+                            <td>
+                                @Html.Kendo().NumericTextBoxFor(d => d.PlannedWeek).Min(1).Max(52).Decimals(0).Name("PlannedWeek").HtmlAttributes(new { @class = "widths" }).Format("#").Events(e=> e.Change("WO.changeYear"))
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().NumericTextBoxFor(d => d.PlannedYear).Max(@Model.MaxYear).Decimals(0).Name("PlannedYear").HtmlAttributes(new { @class = "widths" }).Format("#").Events(e=> e.Change("WO.changeYear"))
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.PlannedDate).Enable(false).HtmlAttributes(new { @class = "widthx", @Value = Model.PlannedDate.ToShortDateString() })
+                            </td>
+                            <td class="dspace"> </td>
+
+
+                            <td>
+
+                                  
+                                @Html.Kendo().NumericTextBoxFor(d => d.OrdersToCreate).Min(1).Decimals(0).HtmlAttributes(new { @class = "widths" }).Format("#").Events(e => e.Change("WO.onOrdersToCreateChange")).Value(1)
+
+                                @*@(Html.Kendo().DropDownListFor(d => d.OrdersToCreate).HtmlAttributes(new { @class = "widths" })
+                                              .DataTextField("Text")
+                                              .DataValueField("Value")
+                                              .DataSource(source =>
+                                                {
+                                                    source.Custom()
+                                                            .ServerFiltering(false)
+                                                            .Type("aspnetmvc-ajax")
+                                                            .Transport(transport =>
+                                                            {
+                                                                transport.Read("GetOrdersToCreate", "../Order");
+                                                            })
+                                                            .Schema(schema =>
+                                                            {
+                                                                schema.Data("Data");
+                                                            });
+                                                }).HtmlAttributes(new { @class = "widths" })
+                                                                .Events(e => e.Change("WO.onOrdersToCreateChange"))
+
+                                )*@
+
+
+
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td colspan="3">
+                                @(Html.Kendo().DropDownListFor(m => m.PlannerCd)
+                                                  .Filter(FilterType.StartsWith)
+
+                                                      .DataTextField("PlannerCd")
+                                                              .DataValueField("PlannerCode")
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                    .ServerFiltering(false)
+                                                                    .Type("aspnetmvc-ajax")
+                                                                    .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetPlanner", "../Order");
+                                                                    })
+                                                                    .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        }).OptionLabel("-Select-")
+                                )
+
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr></tr>
+                        <tr class="blankrow1"></tr>
+                        <tr></tr>
+                    </table>
+}
+                </div>).Expanded(true);
+
+            panelbar.Add().Text("Details")
+            .Content(@<div id="WrkOrderDetails">
+                          @Html.Partial("GrdwrkOrderDetail", new ISS.Core.Model.Order.WorkOrderDetail())
+                    @*@(Html.Kendo().Grid<WorkOrderDetail>().Name("grdwrkOrderDetail").HtmlAttributes(new { @class = "kgridheight" }).Columns(
+                columns =>
+                {
+
+                    columns.Template(t => t.GridMode).ClientTemplate("<input type='checkbox' class ='chckbx'/>").HeaderTemplate("<label><center>All</center></label><input type='checkbox' class='chkbxHeader' Id='SelectAll'/>").Width(30);
+                    columns.Command(command => command.Custom("EditItem").Text(" ").Click("WO.editOrderDetail")).Width(LOVConstants.Width.Small2);
+                    columns.Command(command => command.Custom("DeleteItem").Text(" ").Click("WO.deleteOrderDetail")).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Id).Width(LOVConstants.Width.Small1);
+                    //columns.Bound(s => s.GroupId).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.CreateBd).Width(LOVConstants.Width.Small3)
+                    //    .ClientTemplate("<input  type='checkbox' disabled='disabled' data-bind='checked: CreateBd' #= CreateBd ? checked='checked' : '' #/>");
+                    //columns.Bound(s => s.DozensOnly).Width(LOVConstants.Width.Small3)
+                    //     .ClientTemplate("<input  type='checkbox' disabled='disabled' data-bind='checked: DozensOnly' #= DozensOnly ? checked='checked' : '' #/>");
+                    columns.Bound(s => s.SellingStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.ColorCode).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Attribute).Width(LOVConstants.Width.Small2);
+                    //columns.Bound(s => s.SizeList).Width(50) .ClientTemplate("<span class='k-icon k-i-group'></span>");
+                    columns.Bound(s => s.Size).Width(LOVConstants.Width.Small2).HtmlAttributes(new { @class = "sizeDisp" });
+
+                    columns.Bound(s => s.Revision).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.PKGStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.MfgPathId).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(s => s.GarmentSKU).Width(LOVConstants.Width.Large1);
+                    //columns.Bound(s => s.CutPath).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.SewPlt).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.AttributionPath).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.TotalDozens).Width(LOVConstants.Width.Small2);
+                    //columns.Bound(s => s.Dozens).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.DozenStr).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.Lbs).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.PackCode).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.CategoryCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.PriorityCode).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.BodyTrim).Width(LOVConstants.Width.Small3);
+                    //columns.Bound(s => s.CylinderSizes).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(s => s.BulkNumber).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.Note).Width(50)
+                    .ClientTemplate("<span class='k-icon k-i-pencil cnote'></span>");
+                    columns.Bound(s => s.ErrorMessage).Width(50)
+                     .ClientTemplate("<a class='#=(ErrorStatus) ? 'k-icon k-warning ctooltip':' '#' title=\"#=(ErrorStatus) ? ErrorMessage:' '#\">  </a> ");
+                    //columns.Bound(s => s.ActualLbs).Width(LOVConstants.Width.Small3).Hidden();
+                    //columns.Bound(s => s.AssortCode).Width(LOVConstants.Width.Small3).Hidden();
+                    //columns.Bound(s => s.Note).Width(LOVConstants.Width.Medium1);
+                    //columns.Command(command => command.Custom("Sizes").Click("enterSizes"));
+
+                }
+                        )
+                                .ToolBar(toolbar =>
+                                {
+                                    toolbar.Custom().Name("addNew").Text("Add new record");
+                                    toolbar.Custom().Text("Duplicate").Name("btnWODuplicate");
+                                    //toolbar.Custom().Name("GroupGrid").Text("Group");
+                                    //toolbar.Custom().Name("UngroupGrid").Text("Ungroup");
+                                    
+                                })
+                                                
+                        .Scrollable(scroll =>
+                        {
+                            scroll.Enabled(true);
+                            scroll.Height("auto");
+
+                        }).Resizable(resizing => resizing.Columns(true))
+                        
+                        //.Pageable(conf =>
+                        // {
+                        //    conf.PageSizes(ISS.Common.LOVConstants.PageSizes);
+                        //    conf.Enabled(true);
+                        //}) 
+
+                                       // .Sortable()
+                                        .Events(e => e.DataBound("WO.gridDataBound"))
+                            // .Events(e => e.DataBound("WO.gridMultiSKUBound"))
+                               .DataSource(dataSource => dataSource
+                               .Ajax().ServerOperation(false)
+                                
+                                 ).AutoBind(false)
+
+                    )*@
+
+                          <div id="myDiv" style="display:none">
+
+                              @Html.Partial("WOAddEdit", new WorkOrderDetail())
+                          </div>  
+
+                    <div>
+                        <table class="ttab" width="100%">
+                            <tr class="blankrow1"></tr>
+                            <tr class="blankrow1"></tr>
+                            <tr class="blankrow1"></tr>
+                            <tr>
+
+                                <td class="">
+
+                                    <div class="btnContainer floatRight">
+                                        <input type="reset" value="Clear" id="btnWorkOrderClear" />
+                                    </div>
+
+
+                                    @*<div class="btnContainer floatRight">
+                                        <input type="submit" value="Re-Calc" id="btnWorkOrderReCalc" />
+                                    </div>*@
+                                    <div class="btnContainer floatRight">
+                                        @*@{bool? result = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_ATTRIBUTTED_WORK_ORDER_SAVE);}*@
+                                        @{bool? result = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.KA_ATTRIBUTTED_WORK_ORDER);}
+                                        @if (result.HasValue && result.Value)
+                                        {
+                                            <input type="submit" value="Save" id="btnWorkOrderSave" />
+                                        }
+                                    </div>
+                                </td>
+                                <td></td>
+
+
+
+                            </tr>
+                        </table>
+                    </div>
+                </div>).Expanded(true);
+
+            @*panelbar.Add().Text("Textiles and Cumulatives")
+                .Content(@<div id="Cumulative">
+                    <table class="ttab">
+                        <tr>
+                            <td>
+                                @Html.Partial("TextileFabricDetail", new WorkOrderTextiles())
+                            </td>
+
+                            <td>
+                                @Html.Partial("CumulativeDetail", new WorkOrderCumulative())
+
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr class="blankrow1"></tr>
+
+                    </table>
+
+
+                </div>).Expanded(true);*@
+        })
+        )
+    </div>
+    
+    <div class="divRevSearchPopup" style="display:none;">
+
+        @Html.Partial("../../Views/Order/Partials/_RevSearch", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divmfgPathPopup" style="display:none;">
+
+        @Html.Partial("../../Views/Order/Partials/_mfPathSearch", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divSizesPopup" style="display:none;">
+
+        @Html.Partial("../../Views/Order/Partials/MultiSKUSizeGrid", new ISS.Core.Model.Order.MultiSKUSizes())
+    </div>
+
+    <div class="divPackCodePopup" style="display:none;">
+
+        @Html.Partial("../../Views/Order/Partials/_PackCodePopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divCatCodePopup" style="display:none;">
+
+        @Html.Partial("../../Views/Order/Partials/_CatCodePopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divDuplicate" style="display: none" id="divDuplicatepopup">
+
+</div>
+
+
+<script id="MultiSizeTemplate" type="text/x-kendo-template">
+    <div style="display:block;" class="custTool">
+        <table class="workorder-tooltip">
+            <thead>
+                <tr>
+                    <td>Size Cd</td>
+                    <td>Size</td>
+                    <td>Qty</td>
+                </tr>
+            </thead>
+            # for (var i = 0; i < data.length; i++) { #
+            <tr>
+                <td>#= data[i].SizeCD #</td>
+                <td>#= data[i].Size #</td>
+                @*<td>#= data[i].Size #[#= data[i].Qty #]</td>*@
+                <td>#= data[i].Qty #</td>
+            </tr>
+            # } #
+        </table>
+
+    </div>
+</script>
+
+
+<script id="MultiSKUNoteTemplate" type="text/x-kendo-template">
+    <div style="display:block;" class="custTool">
+        <p>#= data #</p>
+    </div>
+</script>
+
+<script id="MultiSKUErrorTemplate" type="text/x-kendo-template">
+    <div style="display:block;">
+        <p>#= data #</p>
+    </div>
+</script>
+
+<style>
+    .k-tooltip-content p {
+        padding: 5px;
+        width: 160px;
+        text-align: left;
+        white-space: normal;
+        word-wrap: hyphenate;
+    }
+</style>

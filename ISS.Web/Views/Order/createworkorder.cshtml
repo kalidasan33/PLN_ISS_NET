@@ -1,0 +1,452 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc.UI.Fluent;
+@using ISS.Core.Model.Order;
+@using ISS.Common;
+@using ISS.Web.Helpers;
+@using System.Web.Script.Serialization;
+
+
+@model ISS.Core.Model.Order.WorkOrderHeader
+@{
+    ViewBag.Title = "Create Work Order";
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/createWO" + ISSGlobals.Version)
+}
+<style>
+  #myDiv{
+        max-width:900px;
+    }
+  #myDiv  .k-textbox , #myDiv .k-dropdown, #myDiv .k-datepicker, #myDiv .k-numerictextbox{
+      width:130px !important;
+  }
+    </style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        WO.doCreateWOReady();
+        WO.docWOReady2();
+
+
+        WO.const.urlGetAlternateId = '@Url.Action("GetCuttingAltId", "order")'
+        WO.const.urlPopulateCutPathTxtPath = '@Url.Action("PopulateCutPathTxtPath", "order")'
+
+        @if (ViewBag.autoLoad != null && ViewBag.autoLoad)
+        {
+
+            <text>
+
+        setTimeout('WO.loadDetailsGrdFromWOM()', 1000);
+        location.hash = 'autoLoad'
+        </text>
+
+
+        }
+
+    });
+
+
+</script>
+
+<style type="text/css">
+    #grdWorkOrderDetail .k-grid-content {
+        min-height: 100px;
+    }
+</style>
+@Html.Partial("Title", new KeyValuePair<String, String>("title", ViewBag.Title))
+
+
+
+    <div class="expand planForm1  form1 width100" id="contentDiv">
+
+        @(Html.Kendo().PanelBar()
+        .Name("panelbar-images")
+        .Items(panelbar =>
+        {
+            panelbar.Add().Text("Order Information")
+                .Content(@<div>
+@using (Html.BeginForm("CreateWorkOrder", "Order", FormMethod.Get, new { Id = "frmWO" }))
+{
+                    <table class="ttab">
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Dc)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.Dmd)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.DueDate)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedWeek)
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedYear)
+                            </td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannedDate)
+                            </td>
+                            <td class="dspace"> </td>
+
+
+                            <td class="tdlbl1">@Html.CustomLabelFor(d => d.OrdersToCreate)</td>
+                            <td class="dspace"> </td>
+                            <td class="tdlbl1">
+                                @Html.CustomLabelFor(d => d.PlannerCd)
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr>
+                            <td>
+                                @Html.HiddenFor(m => m.SuperOrder)
+                                @Html.Kendo().TextBoxFor(d => d.Dc).Enable(true).HtmlAttributes(new { @class = "widths", maxlength = 3 })
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @*@Html.Kendo().DropDownListFor(d => d.Dmd).BindTo(new List<string>() {"FC"}).HtmlAttributes(new { @class = "widths" }).Enable(false)*@
+                                @Html.Kendo().TextBoxFor(d => d.Dmd).Enable(false).HtmlAttributes(new { @class = "widths" })
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().DropDownListFor(d => d.DueDate).DataSource(source =>
+                                          {
+                                              source.Custom()
+                                              .ServerFiltering(false)
+                                              .Type("aspnetmvc-ajax")
+
+                                              .Transport(transport =>
+                                              {
+                                                  transport.Read("GetDueDate", "Order");
+                                              })
+                                              .Schema(schema =>
+                                              {
+                                                  schema.Data("Data");
+                                              });
+                                          }).DataTextField("Text").DataValueField("Value").HtmlAttributes(new { @class = "widths" })
+
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().NumericTextBoxFor(d => d.PlannedWeek).Min(1).Max(52).Decimals(0).Name("PlannedWeek").HtmlAttributes(new { @class = "widths" }).Format("#")
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().NumericTextBoxFor(d => d.PlannedYear).Max(Model.MaxYear).Min(Model.MinYear).Decimals(0).Name("PlannedYear").HtmlAttributes(new { @class = "widths" }).Format("#")
+                            </td>
+                            <td class="dspace"> </td>
+                            <td>
+                                @Html.Kendo().TextBoxFor(d => d.PlannedDate).Enable(false).HtmlAttributes(new { @class = "widthx", @Value = Model.PlannedDate.ToShortDateString() })
+                            </td>
+                            <td class="dspace"> </td>
+
+
+                            <td>
+
+                                @Html.Kendo().NumericTextBoxFor(d => d.OrdersToCreate).Min(1).Decimals(0).HtmlAttributes(new { @class = "widths" }).Format("#").Events(e => e.Change("WO.onOrdersToCreateChange")).Value(1)
+
+                                @*@(Html.Kendo().ComboBoxFor(d => d.OrdersToCreate).HtmlAttributes(new { @class = "widths" })
+                                              .DataTextField("Text")
+                                              .DataValueField("Value")
+                                              .DataSource(source =>
+                                                {
+                                                    source.Custom()
+                                                            .ServerFiltering(false)
+                                                            .Type("aspnetmvc-ajax")
+                                                            .Transport(transport =>
+                                                            {
+                                                                transport.Read("GetOrdersToCreate", "Order");
+                                                            })
+                                                            .Schema(schema =>
+                                                            {
+                                                                schema.Data("Data");
+                                                            });
+                                                }).HtmlAttributes(new { @class = "widths" })
+                                                                .Events(e => e.Change("WO.onOrdersToCreateChange"))
+
+                                )*@
+
+
+
+
+                            </td>
+                            <td class="dspace"> </td>
+                            <td colspan="3">
+                                @(Html.Kendo().DropDownListFor(m => m.PlannerCd)
+                                                  .Filter(FilterType.StartsWith)
+
+                                                      .DataTextField("PlannerCd")
+                                                              .DataValueField("PlannerCode")
+                                                      .DataSource(source =>
+                                                        {
+                                                            source.Custom()
+                                                                    .ServerFiltering(false)
+                                                                    .Type("aspnetmvc-ajax")
+                                                                    .Transport(transport =>
+                                                                    {
+                                                                        transport.Read("GetPlanner", "Order");
+                                                                    })
+                                                                    .Schema(schema =>
+                                                                    {
+                                                                        schema.Data("Data");
+                                                                    });
+                                                        }).OptionLabel("-Select-")
+                                )
+
+                            </td>
+                        </tr>
+                        <tr class="blankrow1"></tr>
+                        <tr></tr>
+                        <tr class="blankrow1"></tr>
+                        <tr></tr>
+                    </table>
+}
+                </div>).Expanded(true);
+            
+            panelbar.Add().Text("Detail")
+                   .Content(@<div id="WrkOrderDetails">
+                    @Html.Partial("GrdwrkOrderDetail",new ISS.Core.Model.Order.WorkOrderDetail())
+
+    @*panelbar.Add().Text("Detail")
+    .Content(@<div id="WrkOrderDetails">
+        @(Html.Kendo().Grid<WorkOrderDetail>()
+                .Name("grdwrkOrderDetail")
+                .Columns(columns =>
+                {
+                    columns.Template(@<text></text>).ClientTemplate("<input type='checkbox' class='chkbx'  />")
+                        .HeaderTemplate("<label><input type='checkbox' class='chkbxHeader' Id='SelectAll'/> All</label>").Width(LOVConstants.Width.Small2);
+                    columns.Bound(p => p.SellingStyle).Width(LOVConstants.Width.Style).EditorTemplateName("WOStyleCodeEditor");
+                    //columns.Template(t => t.GridMode).ClientTemplate("<input type='checkbox' class='chkbx'  />").HeaderTemplate("Select").Width(50);
+                    //columns.Command(command => command.Custom("EditItem").Text(" ").Click("WO.editOrderDetail")).Width(LOVConstants.Width.Small2);
+                    //columns.Command(command => command.Custom("DeleteItem").Text(" ").Click("WO.deleteOrderDetail")).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Id).Width(LOVConstants.Width.Small1);
+                    columns.Bound(s => s.GroupId).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.CreateBd).Width(LOVConstants.Width.Small3)
+                        .ClientTemplate("<input  type='checkbox' disabled='disabled' data-bind='checked: CreateBd' #= CreateBd ? checked='checked' : '' #/>");
+                    columns.Bound(s => s.DozensOnly).Width(LOVConstants.Width.Small3)
+                         .ClientTemplate("<input  type='checkbox' disabled='disabled' data-bind='checked: DozensOnly' #= DozensOnly ? checked='checked' : '' #/>");
+                    columns.Bound(s => s.SellingStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.ColorCode).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Attribute).Width(LOVConstants.Width.Small2);
+                    //columns.Bound(s => s.SizeList).Width(50) .ClientTemplate("<span class='k-icon k-i-group'></span>");
+                    columns.Bound(s => s.Size).Width(LOVConstants.Width.Large1).HtmlAttributes(new { @class = "sizeDisp" });
+
+                    columns.Bound(s => s.Revision).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.PKGStyle).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.MfgPathId).Width(LOVConstants.Width.Medium1);
+                    columns.Bound(s => s.AlternateId).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.CutPath).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.SewPlt).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.AttributionPath).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.TotalDozens).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Dozens).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.Lbs).Width(LOVConstants.Width.Small2);
+                    columns.Bound(s => s.PackCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.CategoryCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.PriorityCode).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.BodyTrim).Width(LOVConstants.Width.Small3);
+                    columns.Bound(s => s.CylinderSizes).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(s => s.Note).Width(50)
+                    .ClientTemplate("<span class='k-icon k-i-pencil cnote'></span>");
+                    columns.Bound(s => s.ErrorMessage).Width(50)
+                     .ClientTemplate("<a class='#=(ErrorStatus) ? 'k-icon k-warning ctooltip':' '#' title=\"#=(ErrorStatus) ? ErrorMessage:' '#\">  </a> ");
+                    columns.Bound(s => s.ActualLbs).Width(LOVConstants.Width.Small3).Hidden();
+                    columns.Bound(s => s.AssortCode).Width(LOVConstants.Width.Small3).Hidden();
+                    columns.Bound(s => s.PurchaseOrder).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(s => s.LineItem).Width(LOVConstants.Width.Medium2);
+                    columns.Bound(s => s.DemandDriver).Width(LOVConstants.Width.Medium2);
+                    //columns.Bound(s => s.Note).Width(LOVConstants.Width.Medium1);
+                    //columns.Command(command => command.Custom("Sizes").Click("enterSizes"));
+
+                }
+                                                                        )
+                                                                        .ToolBar(toolbar =>
+                                                                        {
+                                                                            toolbar.Create();
+                                                                        })
+                                                                        .Scrollable(scroll =>
+                                                                        {
+                                                                            scroll.Enabled(true);
+                                                                            scroll.Height("auto");
+
+                                                                        })
+                                                                                .DataSource(dataSource => dataSource
+                                                                .Ajax()
+                                                                    .Model(model =>
+                                                                        {
+                                                                            model.Id(p => p.Id);
+                                                                            model.Field(p => p.GroupId);
+                                                                            //model.Field(p => p.Style);
+                                                                            //model.Field(p => p.Description).Editable(false);
+                                                                            //model.Field(p => p.Color);
+                                                                            //model.Field(p => p.Attribute);
+                                                                            //model.Field(p => p.Size);
+                                                                            //model.Field(p => p.SizeLit).Editable(false);
+                                                                            //model.Field(p => p.Rev);
+                                                                            //model.Field(p => p.Uom).Editable(false);
+                                                                            //model.Field(p => p.Qty);
+                                                                            //model.Field(p => p.StdCase);
+                                                                            //model.Field(p => p.Dpr).Editable(false);
+                                                                            //model.Field(p => p.StdCase).Editable(false);
+                                                                            //model.Field(p => p.PlanDate).Editable(false);
+                                                                            //model.Field(p => p.DemandSource);
+                                                                            //model.Field(p => p.DemandDriver);
+                                                                            //model.Field(p => p.OrderType);
+                                                                            //model.Field(p => p.MakeOrBuy);
+                                                                            //model.Field(p => p.DCLoc);
+                                                                            model.Field(p => p.ErrorMessage).Editable(false);
+
+                                                                        })
+                                                                .ServerOperation(false)
+                                                                .Batch(true)
+                                                                .Create(update => update.Action("UpdateRequsitionDetails", "Order"))
+                                                                    .Read(read => read.Action("GetRequisitionDetail", "Order").Data("WO.readDetailData")
+                                                                )
+                                                                .Update(update => update.Action("UpdateRequsitionDetails", "Order"))
+                                                                            .Destroy(update => update.Action("UpdateRequsitionDetails", "Order"))
+                                                                )
+
+        )*@
+
+        <div id="myDiv" style="display:none">
+
+            @Html.Partial("WOAddEdit", new WorkOrderDetail())
+        </div>
+
+        <div>
+            <table class="ttab" width="100%">
+                <tr class="blankrow1"></tr>
+                <tr class="blankrow1"></tr>
+                <tr class="blankrow1"></tr>
+                <tr>
+
+                    <td class="btnContainer floatRight">
+                        <div class="btnContainer floatLeft">
+                            @{bool? result = MenuConfigHelper.IsMenuAuthorised(ConfigConstants.Actions.MULTI_SKU);}
+                            @if (result.HasValue && result.Value)
+                                        {
+                                <input type="submit" value="Save" id="btnWorkOrderSave" />
+                                        }
+                        </div>
+
+
+
+                        <div class="btnContainer floatLeft">
+                            <input type="submit" value="Re-Calc" id="btnWorkOrderReCalc" />
+                        </div>
+                        <div class="btnContainer floatLeft">
+                            <input type="reset" value="Clear" id="btnWorkOrderClear" />
+                        </div>
+
+                    </td>
+                    <td></td>
+
+
+
+                </tr>
+            </table>
+        </div>
+
+    </div>).Expanded(true);
+
+    panelbar.Add().Text("Textiles and Cumulatives")
+    .Content(@<div id="Cumulative">
+        <table class="ttab">
+            <tr>
+                <td>
+                    @Html.Partial("TextileFabricDetail", new WorkOrderTextiles())
+                </td>
+
+                <td>
+                    @Html.Partial("CumulativeDetail", new WorkOrderCumulative())
+
+                </td>
+            </tr>
+            <tr class="blankrow1"></tr>
+            <tr class="blankrow1"></tr>
+
+        </table>
+
+
+    </div>).Expanded(true);
+    })
+    )
+</div>
+
+    <div class="divRevSearchPopup" style="display:none;">
+
+        @Html.Partial("_RevSearch", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divmfgPathPopup" style="display:none;">
+
+        @Html.Partial("_mfPathSearch", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divInLineSizesPopup" style="display:none;">
+
+    @Html.Partial("MultiSKUInLineSizeGrid", new ISS.Core.Model.Order.MultiSKUSizes())
+</div>
+
+    <div class="divPackCodePopup" style="display:none;">
+
+        @Html.Partial("_PackCodePopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divCatCodePopup" style="display:none;">
+
+        @Html.Partial("_CatCodePopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+    <div class="divDCPopup" style="display:none;">
+
+        @Html.Partial("_DCPopup", new ISS.Core.Model.Order.WorkOrderDetail())
+    </div>
+
+
+<script id="MultiSizeTemplate" type="text/x-kendo-template">
+    <div style="display:block;" class="custTool">
+        <table class="workorder-tooltip">
+            <thead>
+                <tr>
+                    <td>Size Cd</td>
+                    <td>Size</td>
+                    <td>Qty</td>
+                </tr>
+            </thead>
+            # for (var i = 0; i < data.length; i++) { #
+            <tr>
+                <td>#= data[i].SizeCD #</td>
+                <td>#= data[i].Size #</td>
+                @*<td>#= data[i].Size #[#= data[i].Qty #]</td>*@
+                <td>#= data[i].Qty #</td>
+            </tr>
+            # } #
+        </table>
+
+    </div>
+</script>
+
+
+<script id="MultiSKUNoteTemplate" type="text/x-kendo-template">
+    <div style="display:block;" class="custTool">
+        <p>#= data #</p>
+    </div>
+</script>
+
+<script id="MultiSKUErrorTemplate" type="text/x-kendo-template">
+    <div style="display:block;">
+        <p>#= data #</p>
+    </div>
+</script>
+
+<style>
+    .k-tooltip-content p {
+        padding: 5px;
+        width: 160px;
+        text-align: left;
+        white-space: normal;
+        word-wrap: hyphenate;
+    }
+</style>

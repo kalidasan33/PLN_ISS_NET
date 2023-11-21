@@ -1,0 +1,15 @@
+﻿
+@(Html.Kendo().DropDownListFor(m => m)
+ .DataSource(source =>
+  {
+      source.Read(read =>
+      {
+          read.Action("GetSkuColors", "Order").Data("WOM.FilterData").Type(HttpVerbs.Post);
+      }).ServerFiltering(false);
+  })
+  .DataValueField("Color")
+  .DataTextField("ColorName")
+      .Events(e => e.Change("WOM.ColorChange"))
+)
+
+
